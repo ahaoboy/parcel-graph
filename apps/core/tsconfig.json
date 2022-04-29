@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports":true,
+    "allowSyntheticDefaultImports": true,
     "outDir": "dist",
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -10,8 +10,9 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "skipLibCheck": true,
-    "declaration": true
+    "declaration": true,
+    "typeRoots": ["node_modules/@types"]
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*", "tests/**/*", "node_modules/@types"],
   "exclude": ["node_modules", "dist"]
 }
