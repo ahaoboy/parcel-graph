@@ -1,0 +1,31 @@
+{
+  "name": "@parcel-graph/core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "@parcel-graph/type": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "latest",
+    "@parcel-graph/test": "workspace:*",
+    "@parcel-graph/type": "workspace:*",
+    "vitest": "latest",
+    "@types/node": "latest",
+    "@types/jest": "latest",
+    "typescript": "latest"
+  },
+  "keywords": [],
+  "author": "阿豪boy",
+  "license": "ISC"
+}
