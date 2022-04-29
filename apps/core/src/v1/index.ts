@@ -1,7 +1,8 @@
-import type { IGraph } from '@parcel-graph/type'
+export * from "./Graph";
+export * from "./AdjacencyList";
 
-export class Graph implements IGraph {
-    addNode(id: number) {
-        return id + 1
-    }
+function* g() {
+  for (let i = 0; i < 10; i++) yield i;
 }
+
+const a = Array.from(g());

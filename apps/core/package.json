@@ -18,7 +18,6 @@
   },
   "devDependencies": {
     "vite": "latest",
-    "@parcel-graph/test": "workspace:*",
     "@parcel-graph/type": "workspace:*",
     "vitest": "latest",
     "@types/node": "latest",

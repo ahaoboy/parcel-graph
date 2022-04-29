@@ -7,7 +7,6 @@ importers:
 
   ../../apps/core:
     specifiers:
-      '@parcel-graph/test': workspace:*
       '@parcel-graph/type': workspace:*
       '@types/jest': latest
       '@types/node': latest
@@ -17,24 +16,8 @@ importers:
     dependencies:
       '@parcel-graph/type': link:../type
     devDependencies:
-      '@parcel-graph/test': link:../test
       '@types/jest': 27.4.1
       '@types/node': 17.0.30
-      typescript: 4.6.4
-      vite: 2.9.6
-      vitest: 0.10.0
-
-  ../../apps/test:
-    specifiers:
-      '@parcel-graph/type': workspace:*
-      chai: latest
-      typescript: latest
-      vite: latest
-      vitest: latest
-    dependencies:
-      '@parcel-graph/type': link:../type
-    devDependencies:
-      chai: 4.3.6
       typescript: 4.6.4
       vite: 2.9.6
       vitest: 0.10.0
