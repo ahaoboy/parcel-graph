@@ -23,9 +23,21 @@ export class Graph<N> implements IGraph<N> {
     }
     return this.#adjacencyList.addEdge(from, to, type);
   }
-  removeEdge(from: number, to: number, type?: number | undefined) {
-    return this.#adjacencyList.removeEdge(from, to, type);
+  removeEdge(
+    from: number,
+    to: number,
+    type?: number | undefined,
+    removeNode = true
+  ) {
+    this.#adjacencyList.removeEdge(from, to, type);
+    if (removeNode && this.isOrphanedNode(to)) {
+      this.removeNode(to);
+    }
+    return true;
   }
+  getInboundEdgesByType() {}
+  getOutboundEdgesByType() {}
+
   serialize() {
     return this.#adjacencyList.serialize();
   }
@@ -33,7 +45,6 @@ export class Graph<N> implements IGraph<N> {
     nodeId: number,
     type: number | undefined | number[] = NullEdgeType
   ) {
-
     return this.#adjacencyList.getNodeIdsConnectedTo(nodeId, type);
   }
   getNodeIdsConnectedFrom(nodeId: number, type?: number | undefined) {
@@ -66,6 +77,29 @@ export class Graph<N> implements IGraph<N> {
 
   hasNode(nodeId: number): boolean {
     return this.#idToNode.has(nodeId);
+  }
+
+  removeNode(nodeId: number): boolean {
+    const node = this.#idToNode.get(nodeId);
+    if (node) {
+      for (const [type, fromSet] of this.#adjacencyList.getInboundEdgesByType(
+        nodeId
+      )) {
+        for (const from of fromSet) {
+          this.removeEdge(from, nodeId, type, false);
+        }
+      }
+      for (const [type, toSet] of this.#adjacencyList.getOutboundEdgesByType(
+        nodeId
+      )) {
+        for (const to of toSet) {
+          this.removeEdge(nodeId, to, type, true);
+        }
+      }
+      this.#nodeToId.delete(node);
+    }
+    this.#idToNode.delete(nodeId);
+    return true;
   }
 
   getNode(id: number): N | null {

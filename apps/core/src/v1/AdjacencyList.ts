@@ -131,6 +131,22 @@ export class AdjacencyList implements IAdjacencyList {
   hasInboundEdges(to: number): boolean {
     return !!this.#inboundEdges.get(to)?.keys.length;
   }
+  removeNode(nodeId: number) {
+    this.#inboundEdges.delete(nodeId);
+    this.#outboundEdges.delete(nodeId);
+  }
+  getInboundEdges(from: number, type: number): Set<number> | undefined {
+    return this.#inboundEdges?.get(from)?.get(type) ?? new Set<number>();
+  }
+  getOutboundEdges(from: number, type: number): Set<number> | undefined {
+    return this.#outboundEdges?.get(from)?.get(type) ?? new Set<number>();
+  }
+  getOutboundEdgesByType(from: number): Map<number, Set<number>> {
+    return this.#outboundEdges.get(from) ?? new Map();
+  }
+  getInboundEdgesByType(from: number): Map<number, Set<number>> {
+    return this.#outboundEdges.get(from) ?? new Map();
+  }
 }
 
 export default {};

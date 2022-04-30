@@ -86,32 +86,32 @@ export function test(Graph: new <T>() => IGraph<T>) {
       assert(!graph.isOrphanedNode(nodeC));
     });
 
-    // it("removeEdge should prune the graph at that edge", () => {
-    //   //         a
-    //   //        / \
-    //   //       b - d
-    //   //      /
-    //   //     c
-    //   let graph = new Graph();
-    //   let nodeA = graph.addNode("a");
-    //   graph.setRootNodeId(nodeA);
-    //   let nodeB = graph.addNode("b");
-    //   let nodeC = graph.addNode("c");
-    //   let nodeD = graph.addNode("d");
-    //   graph.addEdge(nodeA, nodeB);
-    //   graph.addEdge(nodeA, nodeD);
-    //   graph.addEdge(nodeB, nodeC);
-    //   graph.addEdge(nodeB, nodeD);
+    it("removeEdge should prune the graph at that edge", () => {
+      //         a
+      //        / \
+      //       b - d
+      //      /
+      //     c
+      let graph = new Graph();
+      let nodeA = graph.addNode("a");
+      graph.setRootNodeId(nodeA);
+      let nodeB = graph.addNode("b");
+      let nodeC = graph.addNode("c");
+      let nodeD = graph.addNode("d");
+      graph.addEdge(nodeA, nodeB);
+      graph.addEdge(nodeA, nodeD);
+      graph.addEdge(nodeB, nodeC);
+      graph.addEdge(nodeB, nodeD);
 
-    //   graph.removeEdge(nodeA, nodeB);
-    //   assert(graph.nodes.has(nodeA));
-    //   assert(graph.nodes.has(nodeD));
-    //   assert(!graph.nodes.has(nodeB));
-    //   assert(!graph.nodes.has(nodeC));
-    //   assert.deepEqual(
-    //     [...graph.getAllEdges()],
-    //     [{ from: nodeA, to: nodeD, type: 1 }]
-    //   );
-    // });
+      graph.removeEdge(nodeA, nodeB);
+      assert(graph.nodes.has(nodeA));
+      assert(graph.nodes.has(nodeD));
+      assert(!graph.nodes.has(nodeB));
+      assert(!graph.nodes.has(nodeC));
+      assert.deepEqual(
+        [...graph.getAllEdges()],
+        [{ from: nodeA, to: nodeD, type: 1 }]
+      );
+    });
   });
 }
