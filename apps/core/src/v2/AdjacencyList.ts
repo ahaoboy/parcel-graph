@@ -101,7 +101,7 @@ export class AdjacencyList implements IAdjacencyList {
   }
   get stats(): AdjacencyListStats {
     return {
-      nodes: this.#nodes.count,
+      nodes: this.#nodes.getId(),
       edges: [...this.getAllEdges()].length,
       deleted: this.#edges.DELETES,
     };
@@ -594,16 +594,16 @@ export class SharedTypeMap implements Iterable<number> {
 
   /** Get the address of the first item with the given hash. */
   head(hash: number): number | null {
-    return this.data[this.HEADER_SIZE + hash] ?? null;
+    return this.data[this.HEADER_SIZE + hash] || null;
   }
 
   /** Get the address of the next item with the same hash as the given item. */
   next(item: number): number | null {
-    return this.data[item + this.NEXT] ?? null;
+    return this.data[item + this.NEXT] || null;
   }
 
   typeOf(item: number): number {
-    return this.data[item + SharedTypeMap.#TYPE] ?? 0;
+    return this.data[item + SharedTypeMap.#TYPE] || 0;
   }
 
   inspect(): {
@@ -722,8 +722,6 @@ export class SharedTypeMap implements Iterable<number> {
     this.data[COUNT]--;
   }
 }
-
-const s = new SharedTypeMap();
 
 /**
  * Nodes are stored in a `SharedTypeMap`, keyed on node id plus an edge type.
