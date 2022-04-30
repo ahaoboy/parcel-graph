@@ -17,6 +17,7 @@
     "@parcel-graph/type": "workspace:*"
   },
   "devDependencies": {
+    "@parcel/graph": "latest",
     "vite": "latest",
     "sinon": "latest",
     "@parcel-graph/type": "workspace:*",

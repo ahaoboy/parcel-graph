@@ -99,11 +99,83 @@ export class AdjacencyList implements IAdjacencyList {
   getInboundEdges(from: number, type: number): Set<number> {
     return new Set();
   }
-  get stats(): AdjacencyListStats {
+  get stats(): {
+    /** The number of nodes in the graph. */
+    nodes: number;
+    /** The number of edge types associated with nodes in the graph. */
+    nodeEdgeTypes: number;
+    /** The maximum number of nodes the graph can contain. */
+    nodeCapacity: number;
+    /** The size of the raw nodes buffer, in mb. */
+    nodeBufferSize: string;
+    /** The current load on the nodes array. */
+    nodeLoad: string;
+    /** The number of edges in the graph. */
+    edges: number;
+    /** The number of edges deleted from the graph. */
+    deleted: number;
+    /** The maximum number of edges the graph can contain. */
+    edgeCapacity: number;
+    /** The size of the raw edges buffer, in mb. */
+    edgeBufferSize: string;
+    /** The current load on the edges array, including deletes. */
+    edgeLoadWithDeletes: string;
+    /** The current load on the edges array. */
+    edgeLoad: string;
+    /** The total number of edge hash collisions. */
+    collisions: number;
+    /** The number of collisions for the most common hash. */
+    maxCollisions: number;
+    /** The average number of collisions per hash. */
+    avgCollisions: number;
+    /** The likelihood of uniform distribution. ~1.0 indicates certainty. */
+    uniformity: number;
+  } {
+    let buckets = new Map();
+    for (let { from, to, type } of this.getAllEdges()) {
+      let hash = this.#edges.hash(from, to, type);
+      let bucket = buckets.get(hash) || new Set();
+      let key = `${String(from)}, ${String(to)}, ${String(type)}`;
+      assert(!bucket.has(key), `Duplicate node detected: ${key}`);
+      bucket.add(key);
+      buckets.set(hash, bucket);
+    }
+
+    let maxCollisions = 0;
+    let collisions = 0;
+    let distribution = 0;
+
+    for (let bucket of buckets.values()) {
+      maxCollisions = Math.max(maxCollisions, bucket.size - 1);
+      collisions += bucket.size - 1;
+      distribution += (bucket.size * (bucket.size + 1)) / 2;
+    }
+
+    let uniformity =
+      distribution /
+      ((this.#edges.count / (2 * this.#edges.capacity)) *
+        (this.#edges.count + 2 * this.#edges.capacity - 1));
+
     return {
-      nodes: this.#nodes.getId(),
-      edges: [...this.getAllEdges()].length,
-      deleted: this.#edges.DELETES,
+      nodes: this.#nodes.nextId,
+      nodeEdgeTypes: this.#nodes.count,
+      nodeCapacity: this.#nodes.capacity,
+      nodeLoad: `${Math.round(this.#nodes.load * 100)}%`,
+      nodeBufferSize: this.#nodes.bufferSize,
+
+      edges: this.#edges.count,
+      deleted: this.#edges.deletes,
+      edgeCapacity: this.#edges.capacity,
+      edgeLoad: `${Math.round(this.#edges.load * 100)}%`,
+      edgeLoadWithDeletes: `${Math.round(
+        this.#edges.getLoad(this.#edges.count + this.#edges.deletes) * 100
+      )}%`,
+      edgeBufferSize: this.#edges.bufferSize,
+
+      collisions,
+      maxCollisions,
+      avgCollisions: Math.round((collisions / buckets.size) * 100) / 100 || 0,
+      uniformity: Math.round(uniformity * 100) / 100 || 0,
     };
   }
   getInboundEdge(from: number, type: number): Set<number> {
