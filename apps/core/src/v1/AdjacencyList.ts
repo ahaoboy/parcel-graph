@@ -141,11 +141,29 @@ export class AdjacencyList implements IAdjacencyList {
   getOutboundEdges(from: number, type: number): Set<number> {
     return this.#outboundEdges?.get(from)?.get(type) ?? new Set<number>();
   }
-  getOutboundEdgesByType(from: number): Map<number, Set<number>> {
-    return this.#outboundEdges.get(from) ?? new Map();
+  getOutboundEdgesByType(from: number): { type: number; to: number }[] {
+    const edges: { type: number; to: number }[] = [];
+    const map = this.#outboundEdges.get(from);
+    if (map) {
+      for (const [type, toSet] of map)
+        for (const to of toSet) {
+          edges.push({ type, to });
+        }
+    }
+    return edges;
   }
-  getInboundEdgesByType(from: number): Map<number, Set<number>> {
-    return this.#inboundEdges.get(from) ?? new Map();
+  getInboundEdgesByType(to: number): { type: number; from: number }[] {
+    const edges: { type: number; from: number }[] = [];
+    const map = this.#inboundEdges.get(to);
+    if (map) {
+      {
+        for (const [type, fromSet] of map)
+          for (const from of fromSet) {
+            edges.push({ type, from });
+          }
+      }
+    }
+    return edges;
   }
 }
 

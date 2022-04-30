@@ -82,15 +82,19 @@ export class Graph<N> implements IGraph<N> {
   removeNode(nodeId: number): boolean {
     const node = this.#idToNode.get(nodeId);
     if (node) {
-      for (const { type, from } of this.#adjacencyList.getInboundEdgesByType(
+      for (const [type, fromSet] of this.#adjacencyList.getInboundEdgesByType(
         nodeId
       )) {
-        this.removeEdge(from, nodeId, type, false);
+        for (const from of fromSet) {
+          this.removeEdge(from, nodeId, type, false);
+        }
       }
-      for (const { type, to } of this.#adjacencyList.getOutboundEdgesByType(
+      for (const [type, toSet] of this.#adjacencyList.getOutboundEdgesByType(
         nodeId
       )) {
-        this.removeEdge(nodeId, to, type, true);
+        for (const to of toSet) {
+          this.removeEdge(nodeId, to, type, true);
+        }
       }
       this.#nodeToId.delete(node);
     }
