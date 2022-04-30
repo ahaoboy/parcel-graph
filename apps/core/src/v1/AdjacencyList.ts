@@ -145,7 +145,7 @@ export class AdjacencyList implements IAdjacencyList {
     return this.#outboundEdges.get(from) ?? new Map();
   }
   getInboundEdgesByType(from: number): Map<number, Set<number>> {
-    return this.#outboundEdges.get(from) ?? new Map();
+    return this.#inboundEdges.get(from) ?? new Map();
   }
 }
 

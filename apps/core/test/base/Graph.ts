@@ -1,7 +1,7 @@
 import { IAdjacencyList, IGraph } from "@parcel-graph/type";
 import { it, assert, describe } from "vitest";
 import { toNodeId } from "../../src/share";
-
+import sinon from "sinon";
 export function test(Graph: new <T>() => IGraph<T>) {
   describe("Graph", () => {
     it("constructor should initialize an empty graph", () => {
@@ -112,6 +112,219 @@ export function test(Graph: new <T>() => IGraph<T>) {
         [...graph.getAllEdges()],
         [{ from: nodeA, to: nodeD, type: 1 }]
       );
+    });
+
+    it("removing a node recursively deletes orphaned nodes", () => {
+      // before:
+      //       a
+      //      / \
+      //     b   c
+      //    / \    \
+      //   d   e    f
+      //  /
+      // g
+      //
+
+      // after:
+      //      a
+      //       \
+      //        c
+      //         \
+      //          f
+
+      let graph = new Graph();
+      let nodeA = graph.addNode("a");
+      graph.setRootNodeId(nodeA);
+      let nodeB = graph.addNode("b");
+      let nodeC = graph.addNode("c");
+      let nodeD = graph.addNode("d");
+      let nodeE = graph.addNode("e");
+      let nodeF = graph.addNode("f");
+      let nodeG = graph.addNode("g");
+
+      graph.addEdge(nodeA, nodeB);
+      graph.addEdge(nodeA, nodeC);
+      graph.addEdge(nodeB, nodeD);
+      graph.addEdge(nodeB, nodeE);
+      graph.addEdge(nodeC, nodeF);
+      graph.addEdge(nodeD, nodeG);
+
+      graph.removeNode(nodeB);
+      assert.deepEqual([...graph.nodes.keys()], [nodeA, nodeC, nodeF]);
+      assert.deepEqual(Array.from(graph.getAllEdges()), [
+        { from: nodeA, to: nodeC, type: 1 },
+        { from: nodeC, to: nodeF, type: 1 },
+      ]);
+    });
+
+    it("removing a node recursively deletes orphaned nodes if there is no path to the root", () => {
+      // before:
+      //       a
+      //      / \
+      //     b   c
+      //    / \    \
+      // |-d   e    f
+      // |/
+      // g
+      //
+
+      // after:
+      //      a
+      //       \
+      //        c
+      //         \
+      //          f
+
+      let graph = new Graph();
+      let nodeA = graph.addNode("a");
+      let nodeB = graph.addNode("b");
+      let nodeC = graph.addNode("c");
+      let nodeD = graph.addNode("d");
+      let nodeE = graph.addNode("e");
+      let nodeF = graph.addNode("f");
+      let nodeG = graph.addNode("g");
+      graph.setRootNodeId(nodeA);
+
+      graph.addEdge(nodeA, nodeB);
+      graph.addEdge(nodeA, nodeC);
+      graph.addEdge(nodeB, nodeD);
+      graph.addEdge(nodeG, nodeD);
+      graph.addEdge(nodeB, nodeE);
+      graph.addEdge(nodeC, nodeF);
+      graph.addEdge(nodeD, nodeG);
+
+      graph.removeNode(nodeB);
+
+      assert.deepEqual([...graph.nodes.keys()], [nodeA, nodeC, nodeF]);
+      assert.deepEqual(Array.from(graph.getAllEdges()), [
+        { from: nodeA, to: nodeC, type: 1 },
+        { from: nodeC, to: nodeF, type: 1 },
+      ]);
+    });
+
+    it("removing an edge to a node that cycles does not remove it if there is a path to the root", () => {
+      //        a
+      //        |
+      //        b <----
+      //       / \    |
+      //      c   d   |
+      //       \ /    |
+      //        e -----
+      let graph = new Graph();
+      let nodeA = graph.addNode("a");
+      let nodeB = graph.addNode("b");
+      let nodeC = graph.addNode("c");
+      let nodeD = graph.addNode("d");
+      let nodeE = graph.addNode("e");
+      graph.setRootNodeId(nodeA);
+
+      graph.addEdge(nodeA, nodeB);
+      graph.addEdge(nodeB, nodeC);
+      graph.addEdge(nodeB, nodeD);
+      graph.addEdge(nodeC, nodeE);
+      graph.addEdge(nodeD, nodeE);
+      graph.addEdge(nodeE, nodeB);
+
+      const getNodeIds = () => [...graph.nodes.keys()];
+      let nodesBefore = getNodeIds();
+
+      graph.removeEdge(nodeC, nodeE);
+
+      assert.deepEqual(nodesBefore, getNodeIds());
+      assert.deepEqual(Array.from(graph.getAllEdges()), [
+        { from: nodeA, to: nodeB, type: 1 },
+        { from: nodeB, to: nodeC, type: 1 },
+        { from: nodeB, to: nodeD, type: 1 },
+        { from: nodeD, to: nodeE, type: 1 },
+        { from: nodeE, to: nodeB, type: 1 },
+      ]);
+    });
+
+    it("removing a node with only one inbound edge does not cause it to be removed as an orphan", () => {
+      let graph = new Graph();
+
+      let nodeA = graph.addNode("a");
+      let nodeB = graph.addNode("b");
+      graph.setRootNodeId(nodeA);
+
+      graph.addEdge(nodeA, nodeB);
+
+      let spy = sinon.spy(graph, "removeNode");
+      try {
+        graph.removeNode(nodeB);
+
+        assert(spy.calledOnceWithExactly(nodeB));
+      } finally {
+        spy.restore();
+      }
+    });
+
+    it("replaceNodeIdsConnectedTo should update a node's downstream nodes", () => {
+      let graph = new Graph();
+      let nodeA = graph.addNode("a");
+      graph.setRootNodeId(nodeA);
+      let nodeB = graph.addNode("b");
+      let nodeC = graph.addNode("c");
+      graph.addEdge(nodeA, nodeB);
+      graph.addEdge(nodeA, nodeC);
+
+      let nodeD = graph.addNode("d");
+      graph.replaceNodeIdsConnectedTo(nodeA, [nodeB, nodeD]);
+
+      assert(graph.hasNode(nodeA));
+      assert(graph.hasNode(nodeB));
+      assert(!graph.hasNode(nodeC));
+      assert(graph.hasNode(nodeD));
+      assert.deepEqual(Array.from(graph.getAllEdges()), [
+        { from: nodeA, to: nodeB, type: 1 },
+        { from: nodeA, to: nodeD, type: 1 },
+      ]);
+    });
+
+    it("traverses along edge types if a filter is given", () => {
+      let graph = new Graph();
+      let nodeA = graph.addNode("a");
+      let nodeB = graph.addNode("b");
+      let nodeC = graph.addNode("c");
+      let nodeD = graph.addNode("d");
+
+      graph.addEdge(nodeA, nodeB, 2);
+      graph.addEdge(nodeA, nodeD);
+      graph.addEdge(nodeB, nodeC);
+      graph.addEdge(nodeB, nodeD, 2);
+
+      graph.setRootNodeId(nodeA);
+
+      let visited = [];
+      graph.traverse(
+        (nodeId) => {
+          visited.push(nodeId);
+        },
+        null, // use root as startNode
+        2
+      );
+
+      assert.deepEqual(visited, [nodeA, nodeB, nodeD]);
+    });
+
+    it("correctly removes non-tree subgraphs", () => {
+      let graph = new Graph();
+      let nodeRoot = graph.addNode("root");
+      let node1 = graph.addNode("1");
+      let node2 = graph.addNode("2");
+      let node3 = graph.addNode("3");
+
+      graph.addEdge(nodeRoot, node1);
+      graph.addEdge(node1, node2);
+      graph.addEdge(node1, node3);
+      graph.addEdge(node2, node3);
+
+      graph.setRootNodeId(nodeRoot);
+
+      graph.removeNode(node1);
+
+      assert.strictEqual(graph.nodes.size, 1);
+      assert.deepStrictEqual(Array.from(graph.getAllEdges()), []);
     });
   });
 }

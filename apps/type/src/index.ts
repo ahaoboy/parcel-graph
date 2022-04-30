@@ -31,6 +31,7 @@ export interface IGraph<N = number> {
 
   setRootNodeId: (nodeId: number) => void;
   isOrphanedNode: (nodeId: number) => boolean;
+  removeNode: (nodeId: number) => boolean;
 }
 export type NodeId = number;
 export type TraversalActions = {
