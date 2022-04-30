@@ -57,8 +57,6 @@ export interface IAdjacencyList {
   addEdge: (from: number, to: number, type?: number) => boolean;
   removeEdge: (from: number, to: number, type?: number) => boolean;
   serialize: () => { nodes: Uint32Array; edges: Uint32Array };
-  getNodeIdsConnectedTo: (nodeId: number, type?: number) => number[];
-  getNodeIdsConnectedFrom: (nodeId: number, type?: number) => number[];
   getAllEdges: () => Generator<{
     from: number;
     to: number;
@@ -67,4 +65,10 @@ export interface IAdjacencyList {
   hasEdge: (from: number, to: number, type?: number) => boolean;
   resizeEdges: (n: number) => boolean;
   hasInboundEdges: (to: number) => boolean;
+  getNodeIdsConnectedTo: (nodeId: number, type?: number) => number[];
+  getNodeIdsConnectedFrom: (nodeId: number, type?: number) => number[];
+  getInboundEdges: (from: number, type: number) => Set<number>;
+  getOutboundEdges: (from: number, type: number) => Set<number>;
+  getOutboundEdgesByType: (from: number) => Map<number, Set<number>>;
+  getInboundEdgesByType: (from: number) => Map<number, Set<number>>;
 }
