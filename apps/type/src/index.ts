@@ -10,7 +10,11 @@ export interface IGraph<N = number> {
   }>;
   addEdge: (from: number, to: number, type?: number) => boolean;
   removeEdge: (from: number, to: number, type?: number) => boolean;
-  serialize: () => { nodes: Uint32Array; edges: Uint32Array };
+  // serialize: () => {
+  //   nodes: Uint32Array;
+  //   // edges: Uint32Array
+  // };
+  serialize:()=>any;
   getNodeIdsConnectedTo: (nodeId: number, type?: number) => number[];
   getNodeIdsConnectedFrom: (nodeId: number, type?: number) => number[];
   hasEdge: (from: number, to: number, type?: number) => boolean;
