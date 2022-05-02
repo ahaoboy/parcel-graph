@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@parcel-graph/type",
+      "comment": "bump",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@parcel-graph/type"
+}
