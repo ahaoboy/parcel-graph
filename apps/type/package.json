@@ -16,6 +16,6 @@
   "author": "阿豪boy",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^4.6.4"
+    "typescript": "latest"
   }
 }
