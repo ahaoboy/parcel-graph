@@ -28,3 +28,10 @@ export function hash32shift(key: number): number {
   key = key ^ (key >> 16);
   return key;
 }
+
+export const assert = (v: unknown, msg?: string | Error) => {
+  if (!v) {
+    if (msg instanceof Error) throw msg;
+    throw new Error(msg);
+  }
+};

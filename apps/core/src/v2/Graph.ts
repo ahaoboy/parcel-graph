@@ -1,8 +1,7 @@
 import type { IGraph, TraversalActions } from "@parcel-graph/type";
 import { AdjacencyList, SerializedAdjacencyList } from "./AdjacencyList";
-import { assertHasNode, nullthrows, fromNodeId } from "../share";
+import { assert, nullthrows, fromNodeId } from "../share";
 import { NullEdgeType, AllEdgeTypes } from "@parcel-graph/type";
-import assert from "assert";
 
 export function mapVisitor(
   filter: (id: number, action: TraversalActions) => any,

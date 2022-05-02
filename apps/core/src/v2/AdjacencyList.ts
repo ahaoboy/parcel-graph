@@ -1,8 +1,7 @@
-import type { AdjacencyListStats, IAdjacencyList } from "@parcel-graph/type";
-import assert from "assert";
+import type { IAdjacencyList } from "@parcel-graph/type";
 import { AllEdgeTypes } from "@parcel-graph/type";
 import { SharedBuffer } from "../SharedBuffer";
-import { hash32shift } from "../share";
+import { hash32shift, assert } from "../share";
 import { nullthrows } from "../share";
 
 /** The upper bound above which capacity should be increased. */

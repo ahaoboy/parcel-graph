@@ -1,5 +1,5 @@
 import type { AdjacencyListStats, IAdjacencyList } from "@parcel-graph/type";
-import assert from "assert";
+import { assert } from "../share";
 import { NullEdgeType, AllEdgeTypes } from "@parcel-graph/type";
 export class AdjacencyList implements IAdjacencyList {
   #inboundEdges: Map<number, Map<number, Set<number>>> = new Map<
