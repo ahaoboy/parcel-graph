@@ -2,6 +2,18 @@
   "name": "@parcel-graph/core",
   "entries": [
     {
+      "version": "1.0.4",
+      "tag": "@parcel-graph/core_v1.0.4",
+      "date": "Mon, 02 May 2022 08:10:16 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "export v2"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.3",
       "tag": "@parcel-graph/core_v1.0.3",
       "date": "Mon, 02 May 2022 08:00:41 GMT",
