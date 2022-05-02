@@ -281,5 +281,3 @@ export class Graph<N> implements IGraph<N> {
     });
   }
 }
-
-export default {};

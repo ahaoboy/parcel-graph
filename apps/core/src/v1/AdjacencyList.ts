@@ -167,4 +167,3 @@ export class AdjacencyList implements IAdjacencyList {
   }
 }
 
-export default {};

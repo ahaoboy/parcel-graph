@@ -490,4 +490,3 @@ export const deserialize = <N>(opts: GraphOpts<N>): Graph<N> => {
     rootNodeId: opts.rootNodeId,
   });
 };
-export default {};

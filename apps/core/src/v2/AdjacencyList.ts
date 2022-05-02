@@ -492,8 +492,6 @@ export class AdjacencyList implements IAdjacencyList {
   }
 }
 
-export default {};
-
 /**
  * `SharedTypeMap` is a hashmap of items,
  * where each item has its own 'type' field.

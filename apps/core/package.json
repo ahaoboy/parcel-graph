@@ -22,7 +22,6 @@
     "@parcel-graph/type": "workspace:*"
   },
   "devDependencies": {
-    "@parcel-graph/type": "workspace:*",
     "@parcel/graph": "latest",
     "@types/jest": "latest",
     "@types/node": "latest",
