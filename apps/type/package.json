@@ -4,18 +4,22 @@
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
+  "import": "dist/index.mjs",
+  "files": ["dist"],
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "cross-env NODE_ENV=production tsup",
+    "dev": "tsup --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "阿豪boy",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "latest"
+    "cross-env": "latest",
+    "typescript": "latest",
+    "tsup": "latest"
   }
 }
