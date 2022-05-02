@@ -6,8 +6,23 @@ type TContext = any;
 type GraphVisitor<N, C> = any;
 
 export class Graph<N> implements IGraph<N> {
+  private _nodeToId = new Map<N, number>();
+  private _idToNode = new Map<number, N>();
+  private _rootNodeId: number = -1;
+  private _adjacencyList = new AdjacencyList();
+  constructor(opt?: any) {
+    if (opt) {
+      const { nodes, edges } = opt;
+      for (const n of nodes) {
+        this.addNode(n);
+      }
+      for (const { from, to, type } of edges) {
+        this.addEdge(from, to, type);
+      }
+    }
+  }
   setRootNodeId(nodeId: number) {
-    this.#rootNodeId = nodeId;
+    this._rootNodeId = nodeId;
   }
   addEdge(from: number, to: number, type?: number | undefined) {
     if (Number(type) === 0) {
@@ -21,7 +36,7 @@ export class Graph<N> implements IGraph<N> {
     if (!this.getNode(to)) {
       throw new Error(`"to" node '${to}' not found`);
     }
-    return this.#adjacencyList.addEdge(from, to, type);
+    return this._adjacencyList.addEdge(from, to, type);
   }
   removeEdge(
     from: number,
@@ -29,7 +44,7 @@ export class Graph<N> implements IGraph<N> {
     type?: number | undefined,
     removeNode = true
   ) {
-    this.#adjacencyList.removeEdge(from, to, type);
+    this._adjacencyList.removeEdge(from, to, type);
     if (removeNode && this.isOrphanedNode(to)) {
       this.removeNode(to);
     }
@@ -39,74 +54,75 @@ export class Graph<N> implements IGraph<N> {
   getOutboundEdgesByType() {}
 
   serialize() {
-    return this.#adjacencyList.serialize();
+    return {
+      ...this._adjacencyList.serialize(),
+      nodeToId: this._nodeToId,
+      idToNode: this._idToNode,
+    };
   }
   getNodeIdsConnectedTo(
     nodeId: number,
     type: number | undefined | number[] = NullEdgeType
   ) {
-    return this.#adjacencyList.getNodeIdsConnectedTo(nodeId, type);
+    return this._adjacencyList.getNodeIdsConnectedTo(nodeId, type);
   }
   getNodeIdsConnectedFrom(nodeId: number, type?: number | undefined) {
-    return this.#adjacencyList.getNodeIdsConnectedFrom(nodeId, type);
+    return this._adjacencyList.getNodeIdsConnectedFrom(nodeId, type);
   }
 
   hasEdge(from: number, to: number, type?: number | undefined) {
-    return this.#adjacencyList.hasEdge(from, to, type);
+    return this._adjacencyList.hasEdge(from, to, type);
   }
   resizeEdges(n: number) {
     return true;
   }
   get nodes() {
-    return this.#idToNode;
+    return this._idToNode;
   }
-  #nodeToId = new Map<N, number>();
-  #idToNode = new Map<number, N>();
-  #rootNodeId: number = -1;
-  #adjacencyList = new AdjacencyList();
+
   addNode(node: N) {
-    let id = this.#nodeToId.get(node);
+    let id = this._nodeToId.get(node);
     if (id !== undefined) {
       return id;
     }
-    id = this.#adjacencyList.addNode();
-    this.#nodeToId.set(node, id);
-    this.#idToNode.set(id, node);
+    id = this._adjacencyList.addNode();
+    this._nodeToId.set(node, id);
+    this._idToNode.set(id, node);
     return id;
   }
 
   hasNode(nodeId: number): boolean {
-    return this.#idToNode.has(nodeId);
+    return this._idToNode.has(nodeId);
   }
 
   removeNode(nodeId: number): boolean {
-    const node = this.#idToNode.get(nodeId);
+    const node = this._idToNode.get(nodeId);
     if (node) {
-      for (const { type, from } of this.#adjacencyList.getInboundEdgesByType(
+      for (const { type, from } of this._adjacencyList.getInboundEdgesByType(
         nodeId
       )) {
         this.removeEdge(from, nodeId, type, false);
       }
-      for (const { type, to } of this.#adjacencyList.getOutboundEdgesByType(
+      for (const { type, to } of this._adjacencyList.getOutboundEdgesByType(
         nodeId
       )) {
         this.removeEdge(nodeId, to, type, true);
       }
-      this.#nodeToId.delete(node);
+      this._nodeToId.delete(node);
     }
-    this.#idToNode.delete(nodeId);
+    this._idToNode.delete(nodeId);
     return true;
   }
 
   getNode(id: number): N | null {
-    return this.#idToNode.get(id) ?? null;
+    return this._idToNode.get(id) ?? null;
   }
 
   getRootNode(): N | null {
-    return this.#rootNodeId ? this.getNode(this.#rootNodeId) : null;
+    return this._rootNodeId ? this.getNode(this._rootNodeId) : null;
   }
   getAllEdges() {
-    return this.#adjacencyList.getAllEdges();
+    return this._adjacencyList.getAllEdges();
   }
   traverse(visit: any, startNodeId: number, type = NullEdgeType) {
     return this.dfs({
@@ -131,7 +147,7 @@ export class Graph<N> implements IGraph<N> {
     getChildren: Function;
   }) {
     let traversalStartNode = nullthrows(
-      startNodeId ?? this.#rootNodeId,
+      startNodeId ?? this._rootNodeId,
       "A start node is required to traverse"
     );
     this._assertHasNodeId(traversalStartNode);
@@ -234,17 +250,17 @@ export class Graph<N> implements IGraph<N> {
   }
 
   setRootNode(nodeId: number) {
-    this.#rootNodeId = nodeId;
+    this._rootNodeId = nodeId;
   }
   isOrphanedNode(nodeId: NodeId): boolean {
     if (!this.hasNode(nodeId)) {
       return false;
     }
 
-    if (this.#rootNodeId === null) {
+    if (this._rootNodeId === null) {
       // If the graph does not have a root, and there are inbound edges,
       // this node should not be considered orphaned.
-      return !this.#adjacencyList.hasInboundEdges(nodeId);
+      return !this._adjacencyList.hasInboundEdges(nodeId);
     }
 
     // Otherwise, attempt to traverse backwards to the root. If there is a path,
@@ -254,7 +270,7 @@ export class Graph<N> implements IGraph<N> {
     this.traverseAncestors(
       nodeId,
       (ancestorId: number, _: any, actions: any) => {
-        if (ancestorId === this.#rootNodeId) {
+        if (ancestorId === this._rootNodeId) {
           hasPathToRoot = true;
           actions.stop();
         }
@@ -281,3 +297,7 @@ export class Graph<N> implements IGraph<N> {
     });
   }
 }
+
+export const deserialize = (opt?: any) => {
+  return new Graph(opt);
+};

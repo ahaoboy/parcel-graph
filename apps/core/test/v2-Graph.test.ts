@@ -1,4 +1,5 @@
-import { Graph } from '../src/v2'
-import { test } from './base/Graph'
+import { Graph, AdjacencyList } from "../src/v2";
+import { test } from "./base/Graph";
 
-test(Graph)
+test(Graph);
+

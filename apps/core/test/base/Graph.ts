@@ -1,4 +1,4 @@
-import { IAdjacencyList, IGraph } from "@parcel-graph/type";
+import { IGraph } from "@parcel-graph/type";
 import { it, assert, describe } from "vitest";
 import { toNodeId } from "../../src/share";
 import sinon from "sinon";
@@ -295,12 +295,12 @@ export function test(Graph: new <T>() => IGraph<T>) {
 
       graph.setRootNodeId(nodeA);
 
-      let visited = [];
+      let visited: number[] = [];
       graph.traverse(
-        (nodeId) => {
+        (nodeId: any) => {
           visited.push(nodeId);
         },
-        null, // use root as startNode
+        0, // use root as startNode
         2
       );
 

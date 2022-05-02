@@ -75,18 +75,23 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
         b: T
       ) => {
         return (
-          ((a.from << 4) + (a.type << 8) + a.to) -
+          (a.from << 4) +
+          (a.type << 8) +
+          a.to -
           ((b.from << 4) + (b.type << 8) + b.to)
         );
       };
       // 不能保证顺序
-      assert.deepEqual(Array.from(graph.getAllEdges()).sort(cmp), [
-        { from: a, to: b, type: 1 },
-        { from: a, to: c, type: 1 },
-        { from: a, to: b, type: 2 },
-        { from: a, to: b, type: 3 },
-        { from: a, to: d, type: 3 },
-      ].sort(cmp));
+      assert.deepEqual(
+        Array.from(graph.getAllEdges()).sort(cmp),
+        [
+          { from: a, to: b, type: 1 },
+          { from: a, to: c, type: 1 },
+          { from: a, to: b, type: 2 },
+          { from: a, to: b, type: 3 },
+          { from: a, to: d, type: 3 },
+        ].sort(cmp)
+      );
 
       graph.removeEdge(a, b, 2);
       assert.equal(graph.stats.edges, 4);
@@ -166,16 +171,6 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
       assert.equal(graph.addEdge(a, b), false);
     });
 
-    it("addEdge should resize edges array when necessary", () => {
-      let graph = new AdjacencyList();
-      let size = graph.serialize().edges.byteLength;
-      let a = graph.addNode();
-      let b = graph.addNode();
-      graph.addEdge(a, b, 1);
-      graph.addEdge(a, b, 2);
-      graph.addEdge(a, b, 3);
-      assert(size < graph.serialize().edges.byteLength);
-    });
 
     it("addEdge should error when a node has not been added to the graph", () => {
       let graph = new AdjacencyList();

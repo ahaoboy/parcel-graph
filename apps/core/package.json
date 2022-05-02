@@ -10,7 +10,7 @@
     "test": "test"
   },
   "scripts": {
-    "bench": "esno ./benchmark/index.ts",
+    "bench": "npm run build && esno ./benchmark/index.ts",
     "build": "cross-env NODE_ENV=production  tsup",
     "dev": "tsup --watch",
     "test": "vitest",
@@ -21,6 +21,9 @@
     "@parcel-graph/type": "workspace:*"
   },
   "devDependencies": {
+    "@types/sinon": "latest",
+    "traverse": "latest",
+    "@types/benchmark": "latest",
     "esno": "latest",
     "benchmark": "latest",
     "@parcel/graph": "latest",

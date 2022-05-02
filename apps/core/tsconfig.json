@@ -13,6 +13,12 @@
     "declaration": true,
     "typeRoots": ["node_modules/@types"]
   },
-  "include": ["src/**/*", "tests/**/*", "node_modules/@types"],
+  "include": [
+    "src/**/*",
+    "tests/**/*",
+    "node_modules/@types",
+    "test",
+    "benchmark"
+  ],
   "exclude": ["node_modules", "dist"]
 }
