@@ -1086,6 +1086,9 @@ export class EdgeTypeMap extends SharedTypeMap {
   get MAX_CAPACITY(): number {
     return EdgeTypeMap.MAX_CAPACITY;
   }
+  get HEADER_SIZE(): number {
+    return EdgeTypeMap.#HEADER_SIZE;
+  }
   getNextAddress(): number {
     const { ITEM_SIZE } = this;
     return this.addressableLimit + (this.count + this.deletes) * ITEM_SIZE;

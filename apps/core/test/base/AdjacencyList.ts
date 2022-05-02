@@ -70,14 +70,23 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
       assert.ok(graph.hasEdge(a, b, 3));
       assert.ok(graph.hasEdge(a, c));
       assert.ok(graph.hasEdge(a, d, 3));
+      const cmp = <T extends { from: number; type: number; to: number }>(
+        a: T,
+        b: T
+      ) => {
+        return (
+          ((a.from << 4) + (a.type << 8) + a.to) -
+          ((b.from << 4) + (b.type << 8) + b.to)
+        );
+      };
       // 不能保证顺序
-      assert.deepEqual(Array.from(graph.getAllEdges()), [
+      assert.deepEqual(Array.from(graph.getAllEdges()).sort(cmp), [
         { from: a, to: b, type: 1 },
         { from: a, to: c, type: 1 },
         { from: a, to: b, type: 2 },
         { from: a, to: b, type: 3 },
         { from: a, to: d, type: 3 },
-      ]);
+      ].sort(cmp));
 
       graph.removeEdge(a, b, 2);
       assert.equal(graph.stats.edges, 4);
@@ -87,12 +96,15 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
       assert.ok(graph.hasEdge(a, c));
       assert.ok(graph.hasEdge(a, d, 3));
       // 不能保证顺序
-      assert.deepEqual(Array.from(graph.getAllEdges()), [
-        { from: a, to: b, type: 1 },
-        { from: a, to: c, type: 1 },
-        { from: a, to: b, type: 3 },
-        { from: a, to: d, type: 3 },
-      ]);
+      assert.deepEqual(
+        Array.from(graph.getAllEdges()).sort(cmp),
+        [
+          { from: a, to: b, type: 1 },
+          { from: a, to: c, type: 1 },
+          { from: a, to: b, type: 3 },
+          { from: a, to: d, type: 3 },
+        ].sort(cmp)
+      );
     });
 
     it("addEdge should add an edge to the graph", () => {
@@ -228,10 +240,6 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
     //   // $FlowFixMe[prop-missing]
     //   AdjacencyList.prototype.hash = originalHash;
     // });
-
-
-
-
   });
 
   // describe('deserialize', function () {
