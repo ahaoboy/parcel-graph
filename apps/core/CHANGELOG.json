@@ -1,0 +1,20 @@
+{
+  "name": "@parcel-graph/core",
+  "entries": [
+    {
+      "version": "1.0.1",
+      "tag": "@parcel-graph/core_v1.0.1",
+      "date": "Mon, 02 May 2022 07:05:23 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@parcel-graph/type\" to `1.0.1`"
+          },
+          {
+            "comment": "Updating dependency \"@parcel-graph/type\" to `1.0.1`"
+          }
+        ]
+      }
+    }
+  ]
+}

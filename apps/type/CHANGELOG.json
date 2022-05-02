@@ -1,0 +1,17 @@
+{
+  "name": "@parcel-graph/type",
+  "entries": [
+    {
+      "version": "1.0.1",
+      "tag": "@parcel-graph/type_v1.0.1",
+      "date": "Mon, 02 May 2022 07:05:23 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "bump"
+          }
+        ]
+      }
+    }
+  ]
+}
