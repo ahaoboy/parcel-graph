@@ -21,8 +21,8 @@ function interpolate(x: number, y: number, t: number): number {
 }
 
 function increaseNodeCapacity(nodeCapacity: number): number {
-  let { MIN_CAPACITY, MAX_CAPACITY } = NodeTypeMap;
-  let newCapacity = Math.round(nodeCapacity * MIN_GROW_FACTOR);
+  const { MIN_CAPACITY, MAX_CAPACITY } = NodeTypeMap;
+  const newCapacity = Math.round(nodeCapacity * MIN_GROW_FACTOR);
   assert(newCapacity <= MAX_CAPACITY, "Node capacity overflow!");
   return Math.max(MIN_CAPACITY, newCapacity);
 }
@@ -32,15 +32,15 @@ function getNextEdgeCapacity(
   count: number,
   load: number
 ): number {
-  let { MIN_CAPACITY, MAX_CAPACITY, PEAK_CAPACITY } = EdgeTypeMap;
+  const { MIN_CAPACITY, MAX_CAPACITY, PEAK_CAPACITY } = EdgeTypeMap;
   let newCapacity = capacity;
   if (load > LOAD_FACTOR) {
     // This is intended to strike a balance between growing the edge capacity
     // in too small increments, which causes a lot of resizing, and growing
     // the edge capacity in too large increments, which results in a lot of
     // wasted memory.
-    let pct = capacity / PEAK_CAPACITY;
-    let growFactor = interpolate(MAX_GROW_FACTOR, MIN_GROW_FACTOR, pct);
+    const pct = capacity / PEAK_CAPACITY;
+    const growFactor = interpolate(MAX_GROW_FACTOR, MIN_GROW_FACTOR, pct);
     newCapacity = Math.round(capacity * growFactor);
   } else if (load < UNLOAD_FACTOR) {
     // In some cases, it may be possible to shrink the edge capacity,
