@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@parcel-graph/core",
+      "comment": "export v2",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@parcel-graph/core"
+}
