@@ -2,6 +2,26 @@
   "name": "@parcel-graph/core",
   "entries": [
     {
+      "version": "1.0.3",
+      "tag": "@parcel-graph/core_v1.0.3",
+      "date": "Mon, 02 May 2022 08:00:41 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "tsup"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@parcel-graph/type\" to `1.0.2`"
+          },
+          {
+            "comment": "Updating dependency \"@parcel-graph/type\" to `1.0.2`"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.2",
       "tag": "@parcel-graph/core_v1.0.2",
       "date": "Mon, 02 May 2022 07:06:52 GMT",

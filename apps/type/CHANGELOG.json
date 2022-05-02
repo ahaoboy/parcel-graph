@@ -2,6 +2,18 @@
   "name": "@parcel-graph/type",
   "entries": [
     {
+      "version": "1.0.2",
+      "tag": "@parcel-graph/type_v1.0.2",
+      "date": "Mon, 02 May 2022 08:00:41 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "tsup"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.1",
       "tag": "@parcel-graph/type_v1.0.1",
       "date": "Mon, 02 May 2022 07:05:23 GMT",
