@@ -17,14 +17,14 @@
     "@parcel-graph/type": "workspace:*"
   },
   "devDependencies": {
-    "@parcel/graph": "latest",
-    "vite": "latest",
-    "sinon": "latest",
     "@parcel-graph/type": "workspace:*",
-    "vitest": "latest",
-    "@types/node": "latest",
+    "@parcel/graph": "latest",
     "@types/jest": "latest",
-    "typescript": "latest"
+    "@types/node": "latest",
+    "sinon": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest"
   },
   "keywords": [],
   "author": "阿豪boy",
