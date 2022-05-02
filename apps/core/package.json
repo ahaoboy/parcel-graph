@@ -5,13 +5,12 @@
   "main": "./dist/index.js",
   "import": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "directories": {
     "test": "test"
   },
   "scripts": {
+    "bench": "esno ./benchmark/index.ts",
     "build": "cross-env NODE_ENV=production  tsup",
     "dev": "tsup --watch",
     "test": "vitest",
@@ -22,6 +21,8 @@
     "@parcel-graph/type": "workspace:*"
   },
   "devDependencies": {
+    "esno": "latest",
+    "benchmark": "latest",
     "@parcel/graph": "latest",
     "@types/jest": "latest",
     "@types/node": "latest",

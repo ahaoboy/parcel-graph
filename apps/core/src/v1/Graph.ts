@@ -1,6 +1,6 @@
 import type { IGraph, NodeId, TraversalActions } from "@parcel-graph/type";
 import { AdjacencyList } from "./AdjacencyList";
-import { assertHasNode, nullthrows, fromNodeId } from "../share";
+import { nullthrows } from "../share";
 import { NullEdgeType, AllEdgeTypes } from "@parcel-graph/type";
 type TContext = any;
 type GraphVisitor<N, C> = any;
@@ -15,11 +15,11 @@ export class Graph<N> implements IGraph<N> {
     }
 
     if (!this.getNode(from)) {
-      throw new Error(`"from" node '${fromNodeId(from)}' not found`);
+      throw new Error(`"from" node '${from}' not found`);
     }
 
     if (!this.getNode(to)) {
-      throw new Error(`"to" node '${fromNodeId(to)}' not found`);
+      throw new Error(`"to" node '${to}' not found`);
     }
     return this.#adjacencyList.addEdge(from, to, type);
   }
@@ -118,7 +118,7 @@ export class Graph<N> implements IGraph<N> {
   }
   _assertHasNodeId(nodeId: number) {
     if (!this.hasNode(nodeId)) {
-      throw new Error("Does not have node " + fromNodeId(nodeId));
+      throw new Error("Does not have node " + nodeId);
     }
   }
   dfs<TContext>({
