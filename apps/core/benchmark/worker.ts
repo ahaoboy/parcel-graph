@@ -1,12 +1,12 @@
 import { Worker } from "worker_threads";
 import type { IGraph } from "@parcel-graph/type";
 import { V2, V1 } from "../src";
-
+import assert from "assert";
 const test = (Graph: new () => IGraph, type: string) => {
   const worker = new Worker("./w.js");
-  const n = 10000;
+  const n = 1000;
   const ty = 10;
-  const edges = Array(n * 50)
+  const edges = Array(n * 100)
     .fill(0)
     .map(() => {
       const from = 1 + ((Math.random() * n) | 0);
@@ -29,12 +29,14 @@ const test = (Graph: new () => IGraph, type: string) => {
   const st = +new Date();
   const data = g.serialize();
   return new Promise((r) => {
-    worker.addListener("message", () => {
+    worker.addListener("message", (copy) => {
       const ed = +new Date();
       console.log(type, ed - st);
+      assert.deepEqual(data, copy);
       worker.terminate();
       r(0);
     });
+
     worker.postMessage({ data, type });
   });
 };
