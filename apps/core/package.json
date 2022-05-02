@@ -5,7 +5,9 @@
   "main": "./dist/index.js",
   "import": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "directories": {
     "test": "test"
   },
@@ -20,13 +22,13 @@
     "@parcel-graph/type": "workspace:*"
   },
   "devDependencies": {
-    "cross-env": "latest",
-    "tsup": "latest",
     "@parcel-graph/type": "workspace:*",
     "@parcel/graph": "latest",
     "@types/jest": "latest",
     "@types/node": "latest",
+    "cross-env": "latest",
     "sinon": "latest",
+    "tsup": "latest",
     "typescript": "latest",
     "vite": "latest",
     "vitest": "latest"
