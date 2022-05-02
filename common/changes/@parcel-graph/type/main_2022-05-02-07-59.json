@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@parcel-graph/type",
+      "comment": "tsup",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@parcel-graph/type"
+}
