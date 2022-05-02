@@ -272,7 +272,7 @@
   },
 
   "repository": {
-    "url": "https://github.com/ahaoboy/parcel-graph",
+    "url": "https://github.com/ahaoboy/parcel-graph.git",
     "defaultBranch": "main",
     "defaultRemote": "origin"
     /**
