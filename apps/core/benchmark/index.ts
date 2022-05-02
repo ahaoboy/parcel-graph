@@ -1,10 +1,10 @@
 import Benchmark from "benchmark";
 import type { IGraph } from "@parcel-graph/type";
-import { V1, V2 } from "../dist";
+import { V1, V2 } from "../src";
 import * as V0 from "@parcel/graph";
 const n = 10000;
 const type = 10;
-const edges = Array(n * 10)
+const edges = Array(n * 20)
   .fill(0)
   .map(() => {
     const from = 1 + ((Math.random() * n) | 0);
@@ -29,6 +29,8 @@ const test = (Graph: new () => IGraph) => {
   for (let i = 0; i < n; i++) {
     g.getNodeIdsConnectedTo(idMap[i]);
     g.getNodeIdsConnectedFrom(idMap[i]);
+    g.getNodeIdsConnectedFrom(idMap[i]);
+    g.getNodeIdsConnectedTo(idMap[i]);
   }
 };
 

@@ -66,8 +66,8 @@ export type AdjacencyListOptions<T> = {
 };
 
 export class AdjacencyList implements IAdjacencyList {
-  #nodes: NodeTypeMap /*: NodeTypeMap<number | number> */;
-  #edges: EdgeTypeMap /*: EdgeTypeMap<number | number> */;
+  private _nodes: NodeTypeMap /*: NodeTypeMap<number | number> */;
+  private _edges: EdgeTypeMap /*: EdgeTypeMap<number | number> */;
   constructor(
     opts?: SerializedAdjacencyList<number> | AdjacencyListOptions<number>
   ) {
@@ -76,8 +76,8 @@ export class AdjacencyList implements IAdjacencyList {
 
     if (opts?.nodes) {
       ({ nodes, edges } = opts);
-      this.#nodes = new NodeTypeMap(nodes);
-      this.#edges = new EdgeTypeMap(edges);
+      this._nodes = new NodeTypeMap(nodes);
+      this._edges = new EdgeTypeMap(edges);
     } else {
       let {
         nodeCapacity = NodeTypeMap.MIN_CAPACITY,
@@ -91,8 +91,8 @@ export class AdjacencyList implements IAdjacencyList {
         edgeCapacity <= EdgeTypeMap.MAX_CAPACITY,
         "Edge capacity overflow!"
       );
-      this.#nodes = new NodeTypeMap(nodeCapacity);
-      this.#edges = new EdgeTypeMap(edgeCapacity);
+      this._nodes = new NodeTypeMap(nodeCapacity);
+      this._edges = new EdgeTypeMap(edgeCapacity);
     }
   }
   getInboundEdges(from: number, type: number): Set<number> {
@@ -130,9 +130,9 @@ export class AdjacencyList implements IAdjacencyList {
     /** The likelihood of uniform distribution. ~1.0 indicates certainty. */
     uniformity: number;
   } {
-    let buckets = new Map();
+    const buckets = new Map();
     for (let { from, to, type } of this.getAllEdges()) {
-      let hash = this.#edges.hash(from, to, type);
+      const hash = this._edges.hash(from, to, type);
       let bucket = buckets.get(hash) || new Set();
       let key = `${String(from)}, ${String(to)}, ${String(type)}`;
       assert(!bucket.has(key), `Duplicate node detected: ${key}`);
@@ -152,24 +152,24 @@ export class AdjacencyList implements IAdjacencyList {
 
     let uniformity =
       distribution /
-      ((this.#edges.count / (2 * this.#edges.capacity)) *
-        (this.#edges.count + 2 * this.#edges.capacity - 1));
+      ((this._edges.count / (2 * this._edges.capacity)) *
+        (this._edges.count + 2 * this._edges.capacity - 1));
 
     return {
-      nodes: this.#nodes.nextId,
-      nodeEdgeTypes: this.#nodes.count,
-      nodeCapacity: this.#nodes.capacity,
-      nodeLoad: `${Math.round(this.#nodes.load * 100)}%`,
-      nodeBufferSize: this.#nodes.bufferSize,
+      nodes: this._nodes.nextId,
+      nodeEdgeTypes: this._nodes.count,
+      nodeCapacity: this._nodes.capacity,
+      nodeLoad: `${Math.round(this._nodes.load * 100)}%`,
+      nodeBufferSize: this._nodes.bufferSize,
 
-      edges: this.#edges.count,
-      deleted: this.#edges.deletes,
-      edgeCapacity: this.#edges.capacity,
-      edgeLoad: `${Math.round(this.#edges.load * 100)}%`,
+      edges: this._edges.count,
+      deleted: this._edges.deletes,
+      edgeCapacity: this._edges.capacity,
+      edgeLoad: `${Math.round(this._edges.load * 100)}%`,
       edgeLoadWithDeletes: `${Math.round(
-        this.#edges.getLoad(this.#edges.count + this.#edges.deletes) * 100
+        this._edges.getLoad(this._edges.count + this._edges.deletes) * 100
       )}%`,
-      edgeBufferSize: this.#edges.bufferSize,
+      edgeBufferSize: this._edges.bufferSize,
 
       collisions,
       maxCollisions,
@@ -196,8 +196,8 @@ export class AdjacencyList implements IAdjacencyList {
    */
   serialize(): SerializedAdjacencyList<number> {
     return {
-      nodes: this.#nodes.data,
-      edges: this.#edges.data,
+      nodes: this._nodes.data,
+      edges: this._edges.data,
     };
   }
 
@@ -208,11 +208,11 @@ export class AdjacencyList implements IAdjacencyList {
    * the allocated size of the `nodes` array.
    */
   resizeNodes(size: number) {
-    const nodes = this.#nodes;
+    const nodes = this._nodes;
     // Allocate the required space for a `nodes` map of the given `size`.
-    this.#nodes = new NodeTypeMap(size);
+    this._nodes = new NodeTypeMap(size);
     // Copy the existing nodes into the new array.
-    this.#nodes.set(nodes.data);
+    this._nodes.set(nodes.data);
   }
 
   /**
@@ -223,31 +223,30 @@ export class AdjacencyList implements IAdjacencyList {
    */
   resizeEdges(size: number) {
     // Allocate the required space for new `nodes` and `edges` maps.
-    let copy = new AdjacencyList({
-      nodeCapacity: this.#nodes.capacity,
+    const copy = new AdjacencyList({
+      nodeCapacity: this._nodes.capacity,
       edgeCapacity: size,
     });
 
     // Copy the existing edges into the new array.
-    copy.#nodes.nextId = this.#nodes.nextId;
-    this.#edges.forEach(
-      (edge) =>
-        void copy.addEdge(
-          this.#edges.from(edge),
-          this.#edges.to(edge),
-          this.#edges.typeOf(edge)
-        )
+    copy._nodes.nextId = this._nodes.nextId;
+    this._edges.forEach((edge) =>
+      copy.addEdge(
+        this._edges.from(edge),
+        this._edges.to(edge),
+        this._edges.typeOf(edge)
+      )
     );
 
     // We expect to preserve the same number of edges.
     assert(
-      this.#edges.count === copy.#edges.count,
-      `Edge mismatch! ${this.#edges.count} does not match ${copy.#edges.count}.`
+      this._edges.count === copy._edges.count,
+      `Edge mismatch! ${this._edges.count} does not match ${copy._edges.count}.`
     );
 
     // Finally, copy the new data arrays over to this graph.
-    this.#nodes = copy.#nodes;
-    this.#edges = copy.#edges;
+    this._nodes = copy._nodes;
+    this._edges = copy._edges;
     return true;
   }
 
@@ -257,10 +256,10 @@ export class AdjacencyList implements IAdjacencyList {
    * Returns the id of the added node.
    */
   addNode(): number {
-    let id = this.#nodes.getId();
+    const id = this._nodes.getId();
     // If we're in danger of overflowing the `nodes` array, resize it.
-    if (this.#nodes.load > LOAD_FACTOR) {
-      this.resizeNodes(increaseNodeCapacity(this.#nodes.capacity));
+    if (this._nodes.load > LOAD_FACTOR) {
+      this.resizeNodes(increaseNodeCapacity(this._nodes.capacity));
     }
     return id;
   }
@@ -274,73 +273,73 @@ export class AdjacencyList implements IAdjacencyList {
   addEdge(from: number, to: number, type: number | number = 1): boolean {
     assert(type > 0, `Unsupported edge type ${0}`);
 
-    let hash = this.#edges.hash(from, to, type);
-    let edge = this.#edges.addressOf(hash, from, to, type);
+    let hash = this._edges.hash(from, to, type);
+    let edge = this._edges.addressOf(hash, from, to, type);
 
     // The edge is already in the graph; do nothing.
     if (edge !== null) return false;
 
-    let capacity = this.#edges.capacity;
+    let capacity = this._edges.capacity;
     // We add 1 to account for the edge we are adding.
-    let count = this.#edges.count + 1;
+    let count = this._edges.count + 1;
     // Since the space occupied by deleted edges isn't reclaimed,
     // we include them in our count to avoid overflowing the `edges` array.
-    let deletes = this.#edges.deletes;
+    let deletes = this._edges.deletes;
     let total = count + deletes;
     // If we have enough space to keep adding edges, we can
     // put off reclaiming the deleted space until the next resize.
-    if (this.#edges.getLoad(total) > LOAD_FACTOR) {
-      if (this.#edges.getLoad(deletes) > UNLOAD_FACTOR) {
+    if (this._edges.getLoad(total) > LOAD_FACTOR) {
+      if (this._edges.getLoad(deletes) > UNLOAD_FACTOR) {
         // If we have a significant number of deletes, we compute our new
         // capacity based on the current count, even though we decided to
         // resize based on the sum total of count and deletes.
         // In this case, resizing is more like a compaction.
         this.resizeEdges(
-          getNextEdgeCapacity(capacity, count, this.#edges.getLoad(count))
+          getNextEdgeCapacity(capacity, count, this._edges.getLoad(count))
         );
       } else {
         this.resizeEdges(
-          getNextEdgeCapacity(capacity, total, this.#edges.getLoad(total))
+          getNextEdgeCapacity(capacity, total, this._edges.getLoad(total))
         );
       }
       // We must rehash because the capacity has changed.
-      hash = this.#edges.hash(from, to, type);
+      hash = this._edges.hash(from, to, type);
     }
 
-    let toNode = this.#nodes.addressOf(to, type);
-    let fromNode = this.#nodes.addressOf(from, type);
+    let toNode = this._nodes.addressOf(to, type);
+    let fromNode = this._nodes.addressOf(from, type);
     if (toNode === null || fromNode === null) {
       // If we're in danger of overflowing the `nodes` array, resize it.
-      if (this.#nodes.load >= LOAD_FACTOR) {
-        this.resizeNodes(increaseNodeCapacity(this.#nodes.capacity));
+      if (this._nodes.load >= LOAD_FACTOR) {
+        this.resizeNodes(increaseNodeCapacity(this._nodes.capacity));
         // We need to update our indices since the `nodes` array has changed.
-        toNode = this.#nodes.addressOf(to, type);
-        fromNode = this.#nodes.addressOf(from, type);
+        toNode = this._nodes.addressOf(to, type);
+        fromNode = this._nodes.addressOf(from, type);
       }
     }
-    if (toNode === null) toNode = this.#nodes.add(to, type);
-    if (fromNode === null) fromNode = this.#nodes.add(from, type);
+    if (toNode === null) toNode = this._nodes.add(to, type);
+    if (fromNode === null) fromNode = this._nodes.add(from, type);
 
     // Add our new edge to its hash bucket.
-    edge = this.#edges.add(hash, from, to, type);
+    edge = this._edges.add(hash, from, to, type);
 
     // Link this edge to the node's list of incoming edges.
-    let prevIn = this.#nodes.linkIn(toNode, edge);
-    if (prevIn !== null) this.#edges.linkIn(prevIn, edge);
+    const prevIn = this._nodes.linkIn(toNode, edge);
+    if (prevIn !== null) this._edges.linkIn(prevIn, edge);
 
     // Link this edge to the node's list of outgoing edges.
-    let prevOut = this.#nodes.linkOut(fromNode, edge);
-    if (prevOut !== null) this.#edges.linkOut(prevOut, edge);
+    const prevOut = this._nodes.linkOut(fromNode, edge);
+    if (prevOut !== null) this._edges.linkOut(prevOut, edge);
 
     return true;
   }
 
   *getAllEdges() {
-    for (let edge of this.#edges) {
+    for (const edge of this._edges) {
       yield {
-        from: this.#edges.from(edge),
-        to: this.#edges.to(edge),
-        type: this.#edges.typeOf(edge),
+        from: this._edges.from(edge),
+        to: this._edges.to(edge),
+        type: this._edges.typeOf(edge),
       };
     }
   }
@@ -349,87 +348,87 @@ export class AdjacencyList implements IAdjacencyList {
    * Check if the graph has an edge connecting the `from` and `to` nodes.
    */
   hasEdge(from: number, to: number, type: number | number = 1): boolean {
-    const hash = this.#edges.hash(from, to, type);
-    return this.#edges.addressOf(hash, from, to, type) !== null;
+    const hash = this._edges.hash(from, to, type);
+    return this._edges.addressOf(hash, from, to, type) !== null;
   }
 
   /**
    *
    */
   removeEdge(from: number, to: number, type = 1) {
-    let hash = this.#edges.hash(from, to, type);
-    let edge = this.#edges.addressOf(hash, from, to, type);
+    let hash = this._edges.hash(from, to, type);
+    let edge = this._edges.addressOf(hash, from, to, type);
 
     // The edge is not in the graph; do nothing.
     if (edge === null) return false;
 
-    let toNode = nullthrows(this.#nodes.addressOf(to, type));
-    let fromNode = nullthrows(this.#nodes.addressOf(from, type));
+    let toNode = nullthrows(this._nodes.addressOf(to, type));
+    let fromNode = nullthrows(this._nodes.addressOf(from, type));
 
     // Update the terminating node's first and last incoming edges.
-    this.#nodes.unlinkIn(
+    this._nodes.unlinkIn(
       toNode,
       edge,
-      this.#edges.prevIn(edge),
-      this.#edges.nextIn(edge)
+      this._edges.prevIn(edge),
+      this._edges.nextIn(edge)
     );
 
     // Update the originating node's first and last outgoing edges.
-    this.#nodes.unlinkOut(
+    this._nodes.unlinkOut(
       fromNode,
       edge,
-      this.#edges.prevOut(edge),
-      this.#edges.nextOut(edge)
+      this._edges.prevOut(edge),
+      this._edges.nextOut(edge)
     );
 
     // Splice the removed edge out of the linked list of edges in the bucket.
-    this.#edges.unlink(hash, edge);
+    this._edges.unlink(hash, edge);
     // Splice the removed edge out of the linked list of incoming edges.
-    this.#edges.unlinkIn(edge);
+    this._edges.unlinkIn(edge);
     // Splice the removed edge out of the linked list of outgoing edges.
-    this.#edges.unlinkOut(edge);
+    this._edges.unlinkOut(edge);
     // Finally, delete the edge.
-    this.#edges.delete(edge);
+    this._edges.delete(edge);
     return true;
   }
 
   hasInboundEdges(to: number): boolean {
-    let node = this.#nodes.head(to);
+    let node = this._nodes.head(to);
     while (node !== null) {
-      if (this.#nodes.firstIn(node) !== null) return true;
-      node = this.#nodes.next(node);
+      if (this._nodes.firstIn(node) !== null) return true;
+      node = this._nodes.next(node);
     }
     return false;
   }
 
   getInboundEdgesByType(to: number): { type: number; from: number }[] {
     let edges = [];
-    let node = this.#nodes.head(to);
+    let node = this._nodes.head(to);
     while (node !== null) {
-      let type = this.#nodes.typeOf(node);
-      let edge = this.#nodes.firstIn(node);
+      let type = this._nodes.typeOf(node);
+      let edge = this._nodes.firstIn(node);
       while (edge !== null) {
-        let from = this.#edges.from(edge);
+        let from = this._edges.from(edge);
         edges.push({ from, type });
-        edge = this.#edges.nextIn(edge);
+        edge = this._edges.nextIn(edge);
       }
-      node = this.#nodes.next(node);
+      node = this._nodes.next(node);
     }
     return edges;
   }
 
   getOutboundEdgesByType(from: number): { type: number; to: number }[] {
     const edges = [];
-    let node = this.#nodes.head(from);
+    let node = this._nodes.head(from);
     while (node !== null) {
-      let type = this.#nodes.typeOf(node);
-      let edge = this.#nodes.firstOut(node);
+      let type = this._nodes.typeOf(node);
+      let edge = this._nodes.firstOut(node);
       while (edge !== null) {
-        let to = this.#edges.to(edge);
+        let to = this._edges.to(edge);
         edges.push({ to, type });
-        edge = this.#edges.nextOut(edge);
+        edge = this._edges.nextOut(edge);
       }
-      node = this.#nodes.next(node);
+      node = this._nodes.next(node);
     }
     return edges;
   }
@@ -438,23 +437,23 @@ export class AdjacencyList implements IAdjacencyList {
    * Get the list of nodes connected from this node.
    */
   getNodeIdsConnectedFrom(from: number, type = 1): number[] {
-    let matches = (node: number) =>
+    const matches = (node: number) =>
       type === AllEdgeTypes ||
       (Array.isArray(type)
-        ? type.includes(this.#nodes.typeOf(node))
-        : type === this.#nodes.typeOf(node));
+        ? type.includes(this._nodes.typeOf(node))
+        : type === this._nodes.typeOf(node));
 
-    let nodes = [];
-    let node = this.#nodes.head(from);
+    const nodes = [];
+    let node = this._nodes.head(from);
     while (node !== null) {
       if (matches(node)) {
-        let edge = this.#nodes.firstOut(node);
+        let edge = this._nodes.firstOut(node);
         while (edge !== null) {
-          nodes.push(this.#edges.to(edge));
-          edge = this.#edges.nextOut(edge);
+          nodes.push(this._edges.to(edge));
+          edge = this._edges.nextOut(edge);
         }
       }
-      node = this.#nodes.next(node);
+      node = this._nodes.next(node);
     }
     return nodes;
   }
@@ -463,31 +462,31 @@ export class AdjacencyList implements IAdjacencyList {
    * Get the list of nodes connected to this node.
    */
   getNodeIdsConnectedTo(to: number, type = 1): number[] {
-    let matches = (node: number) =>
+    const matches = (node: number) =>
       type === AllEdgeTypes ||
       (Array.isArray(type)
-        ? type.includes(this.#nodes.typeOf(node))
-        : type === this.#nodes.typeOf(node));
+        ? type.includes(this._nodes.typeOf(node))
+        : type === this._nodes.typeOf(node));
 
-    let nodes = [];
-    let node = this.#nodes.head(to);
+    const nodes = [];
+    let node = this._nodes.head(to);
     while (node !== null) {
       if (matches(node)) {
-        let edge = this.#nodes.firstIn(node);
+        let edge = this._nodes.firstIn(node);
         while (edge !== null) {
-          nodes.push(this.#edges.from(edge));
-          edge = this.#edges.nextIn(edge);
+          nodes.push(this._edges.from(edge));
+          edge = this._edges.nextIn(edge);
         }
       }
-      node = this.#nodes.next(node);
+      node = this._nodes.next(node);
     }
     return nodes;
   }
 
   inspect() {
     return {
-      nodes: this.#nodes.inspect(),
-      edges: this.#edges.inspect(),
+      nodes: this._nodes.inspect(),
+      edges: this._edges.inspect(),
     };
   }
 }
@@ -544,12 +543,12 @@ export class SharedTypeMap implements Iterable<number> {
    * │ CAPACITY │ COUNT │
    * └──────────┴───────┘
    */
-  static #HEADER_SIZE: number = 2;
+  static _HEADER_SIZE: number = 2;
 
   /** The offset from the header where the capacity is stored. */
-  static #CAPACITY: 0 = 0;
+  private static _CAPACITY: 0 = 0;
   /** The offset from the header where the count is stored. */
-  static #COUNT: 1 = 1;
+  private static _COUNT: 1 = 1;
 
   /**
    * Each item in `SharedTypeMap` comprises 2 4-byte chunks:
@@ -563,11 +562,11 @@ export class SharedTypeMap implements Iterable<number> {
    * │ NEXT │ TYPE │
    * └──────┴──────┘
    */
-  static #ITEM_SIZE: number = 2;
+  static ITEM_SIZE: number = 2;
   /** The offset at which a link to the next item in the same bucket is stored. */
-  static #NEXT: 0 = 0;
+  private static _NEXT: 0 = 0;
   /** The offset at which an item's type is stored. */
-  static #TYPE: 1 = 1;
+  private static _TYPE: 1 = 1;
 
   /** The number of items to accommodate per hash bucket. */
   static BUCKET_SIZE: number = 2;
@@ -577,21 +576,21 @@ export class SharedTypeMap implements Iterable<number> {
     return SharedTypeMap.BUCKET_SIZE;
   }
   get HEADER_SIZE() {
-    return SharedTypeMap.#HEADER_SIZE;
+    return SharedTypeMap._HEADER_SIZE;
   }
   get ITEM_SIZE() {
-    return SharedTypeMap.#ITEM_SIZE;
+    return SharedTypeMap.ITEM_SIZE;
   }
   get NEXT() {
-    return SharedTypeMap.#NEXT;
+    return SharedTypeMap._NEXT;
   }
 
   get capacity(): number {
-    return this.data[SharedTypeMap.#CAPACITY] ?? 0;
+    return this.data[SharedTypeMap._CAPACITY] ?? 0;
   }
 
   get count(): number {
-    return this.data[SharedTypeMap.#COUNT] ?? 0;
+    return this.data[SharedTypeMap._COUNT] ?? 0;
   }
 
   get load(): number {
@@ -616,7 +615,7 @@ export class SharedTypeMap implements Iterable<number> {
   constructor(capacityOrData: number | Uint32Array = 16) {
     if (typeof capacityOrData === "number") {
       let { BYTES_PER_ELEMENT } = Uint32Array;
-      let CAPACITY = SharedTypeMap.#CAPACITY;
+      const CAPACITY = SharedTypeMap._CAPACITY;
       this.data = new Uint32Array(
         new SharedBuffer(this.getLength(capacityOrData) * BYTES_PER_ELEMENT)
       );
@@ -627,8 +626,8 @@ export class SharedTypeMap implements Iterable<number> {
     }
   }
   *[Symbol.iterator](): Iterator<number> {
-    let max = this.count;
-    let len = this.length;
+    const max = this.count;
+    const len = this.length;
     for (
       let i = this.addressableLimit, count = 0;
       i < len && count < max;
@@ -672,7 +671,7 @@ export class SharedTypeMap implements Iterable<number> {
   }
 
   typeOf(item: number): number {
-    return this.data[item + SharedTypeMap.#TYPE] || 0;
+    return this.data[item + SharedTypeMap._TYPE] || 0;
   }
 
   inspect(): {
@@ -681,8 +680,8 @@ export class SharedTypeMap implements Iterable<number> {
     data: Uint32Array;
   } {
     const { HEADER_SIZE, ITEM_SIZE, BUCKET_SIZE } = this;
-    let min = HEADER_SIZE + this.capacity;
-    let max = min + this.capacity * BUCKET_SIZE * ITEM_SIZE;
+    const min = HEADER_SIZE + this.capacity;
+    const max = min + this.capacity * BUCKET_SIZE * ITEM_SIZE;
     return {
       header: this.data.subarray(0, HEADER_SIZE),
       table: this.data.subarray(HEADER_SIZE, min),
@@ -708,18 +707,18 @@ export class SharedTypeMap implements Iterable<number> {
   }
   set(data: Uint32Array): void {
     const { HEADER_SIZE, ITEM_SIZE } = this;
-    let NEXT = SharedTypeMap.#NEXT;
-    let COUNT = SharedTypeMap.#COUNT;
-    let CAPACITY = SharedTypeMap.#CAPACITY;
+    const NEXT = SharedTypeMap._NEXT;
+    const COUNT = SharedTypeMap._COUNT;
+    const CAPACITY = SharedTypeMap._CAPACITY;
 
-    let delta = this.capacity - data[CAPACITY]!;
+    const delta = this.capacity - data[CAPACITY]!;
     assert(delta >= 0, "Cannot copy to a map with smaller capacity.");
 
     // Copy the header.
     this.data.set(data.subarray(COUNT, HEADER_SIZE), COUNT);
 
     // Copy the hash table.
-    let toTable = this.data.subarray(HEADER_SIZE, HEADER_SIZE + this.capacity);
+    const toTable = this.data.subarray(HEADER_SIZE, HEADER_SIZE + this.capacity);
     toTable.set(data.subarray(HEADER_SIZE, HEADER_SIZE + data[CAPACITY]!));
     // Offset first links to account for the change in table capacity.
     let max = toTable.length;
@@ -728,7 +727,7 @@ export class SharedTypeMap implements Iterable<number> {
     }
 
     // Copy the items.
-    let toItems = this.data.subarray(HEADER_SIZE + this.capacity);
+    const toItems = this.data.subarray(HEADER_SIZE + this.capacity);
     toItems.set(data.subarray(HEADER_SIZE + data[CAPACITY]!));
     // Offset next links to account for the change in table capacity.
     max = toItems.length;
@@ -737,9 +736,9 @@ export class SharedTypeMap implements Iterable<number> {
     }
   }
   link(hash: number, item: number, type: number): void {
-    const COUNT = SharedTypeMap.#COUNT;
-    const NEXT = SharedTypeMap.#NEXT;
-    const TYPE = SharedTypeMap.#TYPE;
+    const COUNT = SharedTypeMap._COUNT;
+    const NEXT = SharedTypeMap._NEXT;
+    const TYPE = SharedTypeMap._TYPE;
     const { HEADER_SIZE } = this;
 
     this.data[item + TYPE] = type;
@@ -760,9 +759,9 @@ export class SharedTypeMap implements Iterable<number> {
   }
 
   unlink(hash: number, item: number): void {
-    const COUNT = SharedTypeMap.#COUNT;
-    const NEXT = SharedTypeMap.#NEXT;
-    const TYPE = SharedTypeMap.#TYPE;
+    const COUNT = SharedTypeMap._COUNT;
+    const NEXT = SharedTypeMap._NEXT;
+    const TYPE = SharedTypeMap._TYPE;
     const { HEADER_SIZE } = this;
 
     this.data[item + TYPE] = 0;
@@ -812,9 +811,9 @@ export class NodeTypeMap extends SharedTypeMap {
    * │ CAPACITY │ COUNT │ NEXT_ID │
    * └──────────┴───────┴─────────┘
    */
-  static #HEADER_SIZE: number = 3;
+  static _HEADER_SIZE: number = 3;
   /** The offset from the header where the next available node id is stored. */
-  static #NEXT_ID = 2;
+  private static _NEXT_ID = 2;
 
   /**
    * In addition to the item fields defined by `SharedTypeMap`,
@@ -833,46 +832,46 @@ export class NodeTypeMap extends SharedTypeMap {
    * │ NEXT │ TYPE │ FIRST_IN │ FIRST_OUT │ LAST_IN │ LAST_OUT │
    * └──────┴──────┴──────────┴───────────┴─────────┴──────────┘
    */
-  static #ITEM_SIZE: number = 6;
+  static ITEM_SIZE: number = 6;
   /** The offset at which a node's first incoming edge of this type is stored. */
-  static #FIRST_IN = 2;
+  private static _FIRST_IN = 2;
   /** The offset at which a node's first outgoing edge of this type is stored. */
-  static #FIRST_OUT = 3;
+  private static _FIRST_OUT = 3;
   /** The offset at which a node's last incoming edge of this type is stored. */
-  static #LAST_IN = 4;
+  private static _LAST_IN = 4;
   /** The offset at which a node's last outgoing edge of this type is stored. */
-  static #LAST_OUT = 5;
+  private static _LAST_OUT = 5;
 
   /** The smallest functional node map capacity. */
   static MIN_CAPACITY: number = 2;
   /** The largest possible node map capacity. */
   static MAX_CAPACITY: number = Math.floor(
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_array_length#what_went_wrong
-    (2 ** 31 - 1 - NodeTypeMap.#HEADER_SIZE) /
-      NodeTypeMap.#ITEM_SIZE /
-      NodeTypeMap.BUCKET_SIZE
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_array_length_what_went_wrong
+    (2 ** 31 - 1 - NodeTypeMap._HEADER_SIZE) /
+      NodeTypeMap.ITEM_SIZE /
+      SharedTypeMap.BUCKET_SIZE
   );
 
   get HEADER_SIZE() {
-    return NodeTypeMap.#HEADER_SIZE;
+    return NodeTypeMap._HEADER_SIZE;
   }
   get NEXT_ID() {
-    return NodeTypeMap.#NEXT_ID;
+    return NodeTypeMap._NEXT_ID;
   }
   get ITEM_SIZE() {
-    return NodeTypeMap.#ITEM_SIZE;
+    return NodeTypeMap.ITEM_SIZE;
   }
   get FIRST_IN() {
-    return NodeTypeMap.#FIRST_IN;
+    return NodeTypeMap._FIRST_IN;
   }
   get FIRST_OUT() {
-    return NodeTypeMap.#FIRST_OUT;
+    return NodeTypeMap._FIRST_OUT;
   }
   get LAST_IN() {
-    return NodeTypeMap.#LAST_IN;
+    return NodeTypeMap._LAST_IN;
   }
   get LAST_OUT() {
-    return NodeTypeMap.#LAST_OUT;
+    return NodeTypeMap._LAST_OUT;
   }
   get MIN_CAPACITY() {
     return NodeTypeMap.MIN_CAPACITY;
@@ -881,15 +880,15 @@ export class NodeTypeMap extends SharedTypeMap {
     return NodeTypeMap.MAX_CAPACITY;
   }
   get nextId(): number {
-    return this.data[NodeTypeMap.#NEXT_ID]!;
+    return this.data[NodeTypeMap._NEXT_ID]!;
   }
   set nextId(nextId: number) {
-    this.data[NodeTypeMap.#NEXT_ID] = nextId;
+    this.data[NodeTypeMap._NEXT_ID] = nextId;
   }
 
   /** Get a unique node id. */
   getId(): number {
-    return this.data[NodeTypeMap.#NEXT_ID]++;
+    return this.data[NodeTypeMap._NEXT_ID]++;
   }
 
   getLoad(count: number = this.count): number {
@@ -897,10 +896,10 @@ export class NodeTypeMap extends SharedTypeMap {
   }
   add(node: number, type: number): number {
     assert(
-      node >= 0 && node < this.data[NodeTypeMap.#NEXT_ID]!,
-      `Invalid node id ${String(node)} (${this.data[NodeTypeMap.#NEXT_ID]})`
+      node >= 0 && node < this.data[NodeTypeMap._NEXT_ID]!,
+      `Invalid node id ${String(node)} (${this.data[NodeTypeMap._NEXT_ID]})`
     );
-    let address = this.getNextAddress();
+    const address = this.getNextAddress();
     this.link(node, address, type);
     return address;
   }
@@ -917,26 +916,26 @@ export class NodeTypeMap extends SharedTypeMap {
   }
 
   firstIn(node: number): number | null {
-    return this.data[node + NodeTypeMap.#FIRST_IN] || null;
+    return this.data[node + NodeTypeMap._FIRST_IN] || null;
   }
 
   firstOut(node: number): number | null {
-    return this.data[node + NodeTypeMap.#FIRST_OUT] || null;
+    return this.data[node + NodeTypeMap._FIRST_OUT] || null;
   }
 
   lastIn(node: number): number | null {
-    return this.data[node + NodeTypeMap.#LAST_IN] || null;
+    return this.data[node + NodeTypeMap._LAST_IN] || null;
   }
 
   lastOut(node: number): number | null {
-    return this.data[node + NodeTypeMap.#LAST_OUT] || null;
+    return this.data[node + NodeTypeMap._LAST_OUT] || null;
   }
 
   linkIn(node: number, edge: number): number | null {
     const first = this.firstIn(node);
     const last = this.lastIn(node);
-    if (first === null) this.data[node + NodeTypeMap.#FIRST_IN] = edge;
-    this.data[node + NodeTypeMap.#LAST_IN] = edge;
+    if (first === null) this.data[node + NodeTypeMap._FIRST_IN] = edge;
+    this.data[node + NodeTypeMap._LAST_IN] = edge;
     return last;
   }
 
@@ -949,18 +948,18 @@ export class NodeTypeMap extends SharedTypeMap {
     const first = this.firstIn(node);
     const last = this.lastIn(node);
     if (last === edge) {
-      this.data[node + NodeTypeMap.#LAST_IN] = prev === null ? 0 : prev;
+      this.data[node + NodeTypeMap._LAST_IN] = prev === null ? 0 : prev;
     }
     if (first === edge) {
-      this.data[node + NodeTypeMap.#FIRST_IN] = next === null ? 0 : next;
+      this.data[node + NodeTypeMap._FIRST_IN] = next === null ? 0 : next;
     }
   }
 
   linkOut(node: number, edge: number): number | null {
     const first = this.firstOut(node);
     const last = this.lastOut(node);
-    if (first === null) this.data[node + NodeTypeMap.#FIRST_OUT] = edge;
-    this.data[node + NodeTypeMap.#LAST_OUT] = edge;
+    if (first === null) this.data[node + NodeTypeMap._FIRST_OUT] = edge;
+    this.data[node + NodeTypeMap._LAST_OUT] = edge;
     return last;
   }
 
@@ -973,10 +972,10 @@ export class NodeTypeMap extends SharedTypeMap {
     const first = this.firstOut(node);
     const last = this.lastOut(node);
     if (last === edge) {
-      this.data[node + NodeTypeMap.#LAST_OUT] = prev === null ? 0 : prev;
+      this.data[node + NodeTypeMap._LAST_OUT] = prev === null ? 0 : prev;
     }
     if (first === edge) {
-      this.data[node + NodeTypeMap.#FIRST_OUT] = next === null ? 0 : next;
+      this.data[node + NodeTypeMap._FIRST_OUT] = next === null ? 0 : next;
     }
   }
 }
@@ -1000,9 +999,9 @@ export class EdgeTypeMap extends SharedTypeMap {
    * │ CAPACITY │ COUNT │ DELETES │
    * └──────────┴───────┴─────────┘
    */
-  static #HEADER_SIZE: number = 3;
+  static _HEADER_SIZE: number = 3;
   /** The offset from the header where the delete count is stored. */
-  static #DELETES = 2;
+  private static _DELETES = 2;
 
   /**
    * In addition to the item fields defined by `SharedTypeMap`,
@@ -1023,59 +1022,59 @@ export class EdgeTypeMap extends SharedTypeMap {
    * │ NEXT │ TYPE │ FROM │ TO │ NEXT_IN │ PREV_IN │ NEXT_OUT │ PREV_OUT │
    * └──────┴──────┴──────┴────┴─────────┴─────────┴──────────┴──────────┘
    */
-  static #ITEM_SIZE: number = 8;
+  static ITEM_SIZE: number = 8;
   /** The offset at which an edge's 'from' node id is stored. */
-  static #FROM = 2;
+  private static _FROM = 2;
   /** The offset at which an edge's 'to' node id is stored. */
-  static #TO = 3;
+  private static _TO = 3;
   /** The offset at which the 'to' node's next incoming edge is stored.  */
-  static #NEXT_IN = 4;
+  private static _NEXT_IN = 4;
   /** The offset at which the 'to' node's previous incoming edge is stored.  */
-  static #PREV_IN = 5;
+  private static _PREV_IN = 5;
   /** The offset at which the 'from' node's next outgoing edge is stored.  */
-  static #NEXT_OUT = 6;
+  private static _NEXT_OUT = 6;
   /** The offset at which the 'from' node's previous outgoing edge is stored.  */
-  static #PREV_OUT = 7;
+  private static _PREV_OUT = 7;
 
   /** The smallest functional edge map capacity. */
   static MIN_CAPACITY: number = 2;
   /** The largest possible edge map capacity. */
   static MAX_CAPACITY: number = Math.floor(
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_array_length#what_went_wrong
-    (2 ** 31 - 1 - EdgeTypeMap.#HEADER_SIZE) /
-      EdgeTypeMap.#ITEM_SIZE /
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_array_length_what_went_wrong
+    (2 ** 31 - 1 - EdgeTypeMap._HEADER_SIZE) /
+      EdgeTypeMap.ITEM_SIZE /
       EdgeTypeMap.BUCKET_SIZE
   );
   /** The size after which to grow the capacity by the minimum factor. */
   static PEAK_CAPACITY: number = 2 ** 18;
 
   get deletes(): number {
-    return this.data[EdgeTypeMap.#DELETES]!;
+    return this.data[EdgeTypeMap._DELETES]!;
   }
 
   get DELETES(): number {
-    return EdgeTypeMap.#DELETES;
+    return EdgeTypeMap._DELETES;
   }
   get ITEM_SIZE(): number {
-    return EdgeTypeMap.#ITEM_SIZE;
+    return EdgeTypeMap.ITEM_SIZE;
   }
   get FROM(): number {
-    return EdgeTypeMap.#FROM;
+    return EdgeTypeMap._FROM;
   }
   get TO(): number {
-    return EdgeTypeMap.#TO;
+    return EdgeTypeMap._TO;
   }
   get NEXT_IN(): number {
-    return EdgeTypeMap.#NEXT_IN;
+    return EdgeTypeMap._NEXT_IN;
   }
   get PREV_IN(): number {
-    return EdgeTypeMap.#PREV_IN;
+    return EdgeTypeMap._PREV_IN;
   }
   get NEXT_OUT(): number {
-    return EdgeTypeMap.#NEXT_OUT;
+    return EdgeTypeMap._NEXT_OUT;
   }
   get PREV_OUT(): number {
-    return EdgeTypeMap.#PREV_OUT;
+    return EdgeTypeMap._PREV_OUT;
   }
   get MIN_CAPACITY(): number {
     return EdgeTypeMap.MIN_CAPACITY;
@@ -1084,7 +1083,7 @@ export class EdgeTypeMap extends SharedTypeMap {
     return EdgeTypeMap.MAX_CAPACITY;
   }
   get HEADER_SIZE(): number {
-    return EdgeTypeMap.#HEADER_SIZE;
+    return EdgeTypeMap._HEADER_SIZE;
   }
   getNextAddress(): number {
     const { ITEM_SIZE } = this;
@@ -1100,15 +1099,15 @@ export class EdgeTypeMap extends SharedTypeMap {
     const edge = this.getNextAddress();
     // Add our new edge to its hash bucket.
     this.link(hash, edge, type);
-    this.data[edge + EdgeTypeMap.#FROM] = from;
-    this.data[edge + EdgeTypeMap.#TO] = to;
+    this.data[edge + EdgeTypeMap._FROM] = from;
+    this.data[edge + EdgeTypeMap._TO] = to;
     return edge;
   }
 
   delete(edge: number): void {
-    this.data[edge + EdgeTypeMap.#FROM] = 0;
-    this.data[edge + EdgeTypeMap.#TO] = 0;
-    this.data[EdgeTypeMap.#DELETES]++;
+    this.data[edge + EdgeTypeMap._FROM] = 0;
+    this.data[edge + EdgeTypeMap._TO] = 0;
+    this.data[EdgeTypeMap._DELETES]++;
   }
 
   addressOf(
@@ -1132,66 +1131,66 @@ export class EdgeTypeMap extends SharedTypeMap {
   }
 
   from(edge: number): number {
-    return this.data[edge + EdgeTypeMap.#FROM]!;
+    return this.data[edge + EdgeTypeMap._FROM]!;
   }
 
   to(edge: number): number {
-    return this.data[edge + EdgeTypeMap.#TO]!;
+    return this.data[edge + EdgeTypeMap._TO]!;
   }
 
   nextIn(edge: number): number | null {
-    return this.data[edge + EdgeTypeMap.#NEXT_IN] || null;
+    return this.data[edge + EdgeTypeMap._NEXT_IN] || null;
   }
 
   prevIn(edge: number): number | null {
-    return this.data[edge + EdgeTypeMap.#PREV_IN] || null;
+    return this.data[edge + EdgeTypeMap._PREV_IN] || null;
   }
 
   linkIn(edge: number, next: number) {
-    this.data[edge + EdgeTypeMap.#NEXT_IN] = next;
-    this.data[next + EdgeTypeMap.#PREV_IN] = edge;
+    this.data[edge + EdgeTypeMap._NEXT_IN] = next;
+    this.data[next + EdgeTypeMap._PREV_IN] = edge;
   }
 
   unlinkIn(edge: number) {
     const next = this.nextIn(edge);
     const prev = this.prevIn(edge);
-    this.data[edge + EdgeTypeMap.#NEXT_IN] = 0;
-    this.data[edge + EdgeTypeMap.#PREV_IN] = 0;
+    this.data[edge + EdgeTypeMap._NEXT_IN] = 0;
+    this.data[edge + EdgeTypeMap._PREV_IN] = 0;
     if (next !== null && prev !== null) {
-      this.data[prev + EdgeTypeMap.#NEXT_IN] = next;
-      this.data[next + EdgeTypeMap.#PREV_IN] = prev;
+      this.data[prev + EdgeTypeMap._NEXT_IN] = next;
+      this.data[next + EdgeTypeMap._PREV_IN] = prev;
     } else if (next !== null) {
-      this.data[next + EdgeTypeMap.#PREV_IN] = 0;
+      this.data[next + EdgeTypeMap._PREV_IN] = 0;
     } else if (prev !== null) {
-      this.data[prev + EdgeTypeMap.#NEXT_IN] = 0;
+      this.data[prev + EdgeTypeMap._NEXT_IN] = 0;
     }
   }
 
   nextOut(edge: number): number | null {
-    return this.data[edge + EdgeTypeMap.#NEXT_OUT] || null;
+    return this.data[edge + EdgeTypeMap._NEXT_OUT] || null;
   }
 
   prevOut(edge: number): number | null {
-    return this.data[edge + EdgeTypeMap.#PREV_OUT] || null;
+    return this.data[edge + EdgeTypeMap._PREV_OUT] || null;
   }
 
   linkOut(edge: number, next: number) {
-    this.data[edge + EdgeTypeMap.#NEXT_OUT] = next;
-    this.data[next + EdgeTypeMap.#PREV_OUT] = edge;
+    this.data[edge + EdgeTypeMap._NEXT_OUT] = next;
+    this.data[next + EdgeTypeMap._PREV_OUT] = edge;
   }
 
   unlinkOut(edge: number) {
     const next = this.nextOut(edge);
     const prev = this.prevOut(edge);
-    this.data[edge + EdgeTypeMap.#NEXT_OUT] = 0;
-    this.data[edge + EdgeTypeMap.#PREV_OUT] = 0;
+    this.data[edge + EdgeTypeMap._NEXT_OUT] = 0;
+    this.data[edge + EdgeTypeMap._PREV_OUT] = 0;
     if (next !== null && prev !== null) {
-      this.data[prev + EdgeTypeMap.#NEXT_OUT] = next;
-      this.data[next + EdgeTypeMap.#PREV_OUT] = prev;
+      this.data[prev + EdgeTypeMap._NEXT_OUT] = next;
+      this.data[next + EdgeTypeMap._PREV_OUT] = prev;
     } else if (next !== null) {
-      this.data[next + EdgeTypeMap.#PREV_OUT] = 0;
+      this.data[next + EdgeTypeMap._PREV_OUT] = 0;
     } else if (prev !== null) {
-      this.data[prev + EdgeTypeMap.#NEXT_OUT] = 0;
+      this.data[prev + EdgeTypeMap._NEXT_OUT] = 0;
     }
   }
 
