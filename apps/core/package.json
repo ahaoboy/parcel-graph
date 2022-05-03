@@ -11,7 +11,7 @@
   },
   "scripts": {
     "bench": "npm run build && esno ./benchmark/index.ts",
-    "build": "cross-env NODE_ENV=production  tsup",
+    "build": "rimraf dist && tsc && cross-env NODE_ENV=production  tsup",
     "dev": "tsup --watch",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -21,6 +21,7 @@
     "@parcel-graph/type": "workspace:*"
   },
   "devDependencies": {
+    "rimraf": "latest",
     "@types/sinon": "latest",
     "traverse": "latest",
     "@types/benchmark": "latest",

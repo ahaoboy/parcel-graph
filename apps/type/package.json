@@ -10,7 +10,7 @@
     "test": "test"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production tsup",
+    "build": "rimraf dist && tsc && cross-env NODE_ENV=production tsup",
     "dev": "tsup --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,6 +18,8 @@
   "author": "阿豪boy",
   "license": "ISC",
   "devDependencies": {
+    "rimraf": "latest",
+    "@types/node": "latest",
     "cross-env": "latest",
     "typescript": "latest",
     "tsup": "latest"
