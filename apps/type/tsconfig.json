@@ -7,8 +7,9 @@
     "target": "esnext",
     "strict": true,
     "module": "ESNext",
+    "moduleResolution": "node",
     "declaration": true
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*", "tests/**/*", "tsup.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

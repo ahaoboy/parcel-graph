@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/index.js",
   "import": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/src/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -13,7 +13,7 @@
     "test": "test"
   },
   "scripts": {
-    "bench": "npm run build && esno ./benchmark/index.ts",
+    "bench": "esno ./benchmark/index.ts",
     "build": "rimraf dist && tsc && cross-env NODE_ENV=production  tsup",
     "dev": "tsup --watch",
     "test": "vitest",
