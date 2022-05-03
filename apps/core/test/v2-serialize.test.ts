@@ -1,4 +1,4 @@
-import { Graph, deserialize } from "../src/v2";
+import { Graph } from "../src/v2";
 import { testGraph } from "./base/serialize";
 
-testGraph(Graph, deserialize);
+testGraph(Graph);

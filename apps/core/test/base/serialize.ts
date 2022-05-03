@@ -1,6 +1,8 @@
 import { IGraph } from "@parcel-graph/type";
 import { it, assert, describe } from "vitest";
-export function testGraph(Graph: new <T>() => IGraph<T>, deserialize: any) {
+export function testGraph(
+  Graph: (new <T>() => IGraph<T>) & { deserialize: any }
+) {
   describe("Graph", () => {
     it("serialize", () => {
       const graph = new Graph();
@@ -16,7 +18,7 @@ export function testGraph(Graph: new <T>() => IGraph<T>, deserialize: any) {
         }
       }
       const data = graph.serialize();
-      const copy = deserialize(data);
+      const copy = Graph.deserialize(data);
       assert.deepEqual(data, copy.serialize());
     });
   });

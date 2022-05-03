@@ -60,7 +60,7 @@ export interface IAdjacencyList {
   addNode: () => number;
   addEdge: (from: number, to: number, type?: number) => boolean;
   removeEdge: (from: number, to: number, type?: number) => boolean;
-  serialize: () => { nodes: Uint32Array; edges: Uint32Array };
+  serialize: () => any;
   getAllEdges: () => Generator<{
     from: number;
     to: number;

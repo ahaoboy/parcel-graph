@@ -296,8 +296,7 @@ export class Graph<N> implements IGraph<N> {
       getChildren: (nodeId: number) => this.getNodeIdsConnectedTo(nodeId, type),
     });
   }
+  static deserialize(opt?: any) {
+    return new Graph(opt);
+  }
 }
-
-export const deserialize = (opt?: any) => {
-  return new Graph(opt);
-};

@@ -482,11 +482,11 @@ export class Graph<N> implements IGraph<N> {
       throw new Error("Does not have node " + fromNodeId(nodeId));
     }
   }
+  static deserialize<N>(opts: GraphOpts<N>): Graph<N> {
+    return new Graph<N>({
+      nodes: opts.nodes,
+      adjacencyList: opts.adjacencyList,
+      rootNodeId: opts.rootNodeId,
+    });
+  }
 }
-export const deserialize = <N>(opts: GraphOpts<N>): Graph<N> => {
-  return new Graph<N>({
-    nodes: opts.nodes,
-    adjacencyList: opts.adjacencyList,
-    rootNodeId: opts.rootNodeId,
-  });
-};
