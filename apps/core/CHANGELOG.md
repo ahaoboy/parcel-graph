@@ -1,6 +1,13 @@
 # Change Log - @parcel-graph/core
 
-This log was last generated on Mon, 02 May 2022 08:10:16 GMT and should not be manually modified.
+This log was last generated on Tue, 03 May 2022 05:57:35 GMT and should not be manually modified.
+
+## 1.0.5
+Tue, 03 May 2022 05:57:35 GMT
+
+### Patches
+
+- type
 
 ## 1.0.4
 Mon, 02 May 2022 08:10:16 GMT
