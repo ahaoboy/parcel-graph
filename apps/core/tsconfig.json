@@ -11,6 +11,7 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "declaration": true,
+    "downlevelIteration": true,
     "emitDeclarationOnly": true,
     "typeRoots": ["node_modules/@types"]
   },
