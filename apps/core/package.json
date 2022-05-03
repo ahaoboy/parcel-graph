@@ -5,7 +5,9 @@
   "main": "./dist/index.js",
   "import": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "directories": {
     "test": "test"
   },
@@ -21,17 +23,17 @@
     "@parcel-graph/type": "workspace:*"
   },
   "devDependencies": {
-    "rimraf": "latest",
-    "@types/sinon": "latest",
-    "traverse": "latest",
-    "@types/benchmark": "latest",
-    "esno": "latest",
-    "benchmark": "latest",
     "@parcel/graph": "latest",
+    "@types/benchmark": "latest",
     "@types/jest": "latest",
     "@types/node": "latest",
+    "@types/sinon": "latest",
+    "benchmark": "latest",
     "cross-env": "latest",
+    "esno": "latest",
+    "rimraf": "latest",
     "sinon": "latest",
+    "traverse": "latest",
     "tsup": "latest",
     "typescript": "latest",
     "vite": "latest",
