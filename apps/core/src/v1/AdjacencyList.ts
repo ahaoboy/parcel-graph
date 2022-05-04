@@ -76,13 +76,13 @@ export class AdjacencyList implements IAdjacencyList {
     const keys = [...typeMap.keys()].filter(
       (i) => typeSet.has(AllEdgeTypes) || typeSet.has(i)
     );
-    const nodes: number[] = [];
+    const nodes = new Set<number>();
     for (const k of keys) {
       for (const id of typeMap.get(k) ?? []) {
-        nodes.push(id);
+        nodes.add(id);
       }
     }
-    return nodes;
+    return [...nodes];
   }
   getNodeIdsConnectedFrom(from: number, type = NullEdgeType) {
     const typeSet = new Set<number>(Array.isArray(type) ? type : [type]);
@@ -91,13 +91,14 @@ export class AdjacencyList implements IAdjacencyList {
     const keys = [...typeMap.keys()].filter(
       (i) => typeSet.has(AllEdgeTypes) || typeSet.has(i)
     );
-    const nodes: number[] = [];
+    const nodes = new Set<number>();
+
     for (const k of keys) {
       for (const id of typeMap.get(k) ?? []) {
-        nodes.push(id);
+        nodes.add(id);
       }
     }
-    return nodes;
+    return [...nodes];
   }
   get nodes() {
     return [...this._nodesSet];

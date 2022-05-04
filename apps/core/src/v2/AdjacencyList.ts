@@ -443,19 +443,19 @@ export class AdjacencyList implements IAdjacencyList {
         ? type.includes(this._nodes.typeOf(node))
         : type === this._nodes.typeOf(node));
 
-    const nodes = [];
+    const nodes = new Set<number>();
     let node = this._nodes.head(from);
     while (node !== null) {
       if (matches(node)) {
         let edge = this._nodes.firstOut(node);
         while (edge !== null) {
-          nodes.push(this._edges.to(edge));
+          nodes.add(this._edges.to(edge));
           edge = this._edges.nextOut(edge);
         }
       }
       node = this._nodes.next(node);
     }
-    return nodes;
+    return [...nodes];
   }
 
   /**
@@ -468,19 +468,19 @@ export class AdjacencyList implements IAdjacencyList {
         ? type.includes(this._nodes.typeOf(node))
         : type === this._nodes.typeOf(node));
 
-    const nodes = [];
+    const nodes = new Set<number>();
     let node = this._nodes.head(to);
     while (node !== null) {
       if (matches(node)) {
         let edge = this._nodes.firstIn(node);
         while (edge !== null) {
-          nodes.push(this._edges.from(edge));
+          nodes.add(this._edges.from(edge));
           edge = this._edges.nextIn(edge);
         }
       }
       node = this._nodes.next(node);
     }
-    return nodes;
+    return [...nodes];
   }
 
   inspect() {

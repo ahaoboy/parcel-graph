@@ -236,7 +236,17 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
     //   AdjacencyList.prototype.hash = originalHash;
     // });
   });
-
+  it("getNodeIdsConnectedTo and getNodeIdsConnectedFrom should remove duplicate values", () => {
+    let graph = new AdjacencyList();
+    let a = graph.addNode();
+    let b = graph.addNode();
+    let c = graph.addNode();
+    graph.addEdge(a, b);
+    graph.addEdge(a, c);
+    graph.addEdge(a, b, 2);
+    assert.deepEqual(graph.getNodeIdsConnectedFrom(a, -1), [b, c]);
+    assert.deepEqual(graph.getNodeIdsConnectedTo(b, -1), [a]);
+  });
   // describe('deserialize', function () {
   //   this.timeout(10000);
 
