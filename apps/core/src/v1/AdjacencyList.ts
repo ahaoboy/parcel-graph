@@ -14,7 +14,7 @@ export class AdjacencyList implements IAdjacencyList {
   private _NEXT_NODE_ID = 0;
   constructor() {
   }
-  _addEdgeTo(
+  private _addEdgeTo(
     from: number,
     to: number,
     type: number,

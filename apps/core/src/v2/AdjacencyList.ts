@@ -66,8 +66,8 @@ export type AdjacencyListOptions<T> = {
 };
 
 export class AdjacencyList implements IAdjacencyList {
-  private _nodes: NodeTypeMap /*: NodeTypeMap<number | number> */;
-  private _edges: EdgeTypeMap /*: EdgeTypeMap<number | number> */;
+  _nodes: NodeTypeMap /*: NodeTypeMap<number | number> */;
+  _edges: EdgeTypeMap /*: EdgeTypeMap<number | number> */;
   constructor(
     opts?: SerializedAdjacencyList<number> | AdjacencyListOptions<number>
   ) {
@@ -271,7 +271,7 @@ export class AdjacencyList implements IAdjacencyList {
    * or `false` if the edge already exists.
    */
   addEdge(from: number, to: number, type: number | number = 1): boolean {
-    assert(type > 0, `Unsupported edge type ${0}`);
+    assert(type > 0, `Unsupported edge type ${type}`);
 
     let hash = this._edges.hash(from, to, type);
     let edge = this._edges.addressOf(hash, from, to, type);
@@ -848,8 +848,8 @@ export class NodeTypeMap extends SharedTypeMap {
   static MAX_CAPACITY: number = Math.floor(
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_array_length_what_went_wrong
     (2 ** 31 - 1 - NodeTypeMap._HEADER_SIZE) /
-      NodeTypeMap.ITEM_SIZE /
-      SharedTypeMap.BUCKET_SIZE
+    NodeTypeMap.ITEM_SIZE /
+    SharedTypeMap.BUCKET_SIZE
   );
 
   get HEADER_SIZE() {
@@ -1042,8 +1042,8 @@ export class EdgeTypeMap extends SharedTypeMap {
   static MAX_CAPACITY: number = Math.floor(
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_array_length_what_went_wrong
     (2 ** 31 - 1 - EdgeTypeMap._HEADER_SIZE) /
-      EdgeTypeMap.ITEM_SIZE /
-      EdgeTypeMap.BUCKET_SIZE
+    EdgeTypeMap.ITEM_SIZE /
+    EdgeTypeMap.BUCKET_SIZE
   );
   /** The size after which to grow the capacity by the minimum factor. */
   static PEAK_CAPACITY: number = 2 ** 18;
