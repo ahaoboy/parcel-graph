@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@parcel-graph/core",
+      "comment": "remove dup val",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@parcel-graph/core"
+}
