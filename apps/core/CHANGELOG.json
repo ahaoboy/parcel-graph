@@ -2,6 +2,23 @@
   "name": "@parcel-graph/core",
   "entries": [
     {
+      "version": "1.0.7",
+      "tag": "@parcel-graph/core_v1.0.7",
+      "date": "Thu, 05 May 2022 02:17:31 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "remove dup val"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@parcel-graph/type\" to `1.0.4`"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.6",
       "tag": "@parcel-graph/core_v1.0.6",
       "date": "Tue, 03 May 2022 08:15:59 GMT",

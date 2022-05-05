@@ -1,6 +1,13 @@
 # Change Log - @parcel-graph/core
 
-This log was last generated on Tue, 03 May 2022 08:15:59 GMT and should not be manually modified.
+This log was last generated on Thu, 05 May 2022 02:17:31 GMT and should not be manually modified.
+
+## 1.0.7
+Thu, 05 May 2022 02:17:31 GMT
+
+### Patches
+
+- remove dup val
 
 ## 1.0.6
 Tue, 03 May 2022 08:15:59 GMT
