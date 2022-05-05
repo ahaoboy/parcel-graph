@@ -126,13 +126,13 @@ export class Graph<N> implements IGraph<N> {
     return this.adjacencyList.hasEdge(from, to, type);
   }
 
-  getNodeIdsConnectedTo(nodeId: number, type = NullEdgeType): Array<number> {
+  getNodeIdsConnectedTo(nodeId: number, type = NullEdgeType): Iterable<number> {
     this._assertHasNodeId(nodeId);
 
     return this.adjacencyList.getNodeIdsConnectedTo(nodeId, type);
   }
 
-  getNodeIdsConnectedFrom(nodeId: number, type = NullEdgeType): Array<number> {
+  getNodeIdsConnectedFrom(nodeId: number, type = NullEdgeType): Iterable<number> {
     this._assertHasNodeId(nodeId);
     return this.adjacencyList.getNodeIdsConnectedFrom(nodeId, type);
   }
@@ -242,7 +242,7 @@ export class Graph<N> implements IGraph<N> {
   ): void {
     this._assertHasNodeId(fromNodeId);
 
-    let outboundEdges = this.getNodeIdsConnectedFrom(fromNodeId, type);
+    let outboundEdges = [...this.getNodeIdsConnectedFrom(fromNodeId, type)];
     let childrenToRemove = new Set(
       replaceFilter
         ? outboundEdges.filter((toNodeId) => replaceFilter(toNodeId))
@@ -301,7 +301,7 @@ export class Graph<N> implements IGraph<N> {
     getChildren,
   }: {
     visit: any;
-    getChildren(nodeId: number): Array<number>;
+    getChildren(nodeId: number): Iterable<number>;
     startNodeId?: number;
   }): any {
     let traversalStartNode = nullthrows(

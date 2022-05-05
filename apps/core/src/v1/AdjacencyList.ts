@@ -82,7 +82,7 @@ export class AdjacencyList implements IAdjacencyList {
         nodes.add(id);
       }
     }
-    return [...nodes];
+    return nodes;
   }
   getNodeIdsConnectedFrom(from: number, type = NullEdgeType) {
     const typeSet = new Set<number>(Array.isArray(type) ? type : [type]);
@@ -98,7 +98,7 @@ export class AdjacencyList implements IAdjacencyList {
         nodes.add(id);
       }
     }
-    return [...nodes];
+    return nodes;
   }
   get nodes() {
     return [...this._nodesSet];

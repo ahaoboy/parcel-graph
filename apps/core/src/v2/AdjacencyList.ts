@@ -436,7 +436,7 @@ export class AdjacencyList implements IAdjacencyList {
   /**
    * Get the list of nodes connected from this node.
    */
-  getNodeIdsConnectedFrom(from: number, type = 1): number[] {
+  getNodeIdsConnectedFrom(from: number, type = 1):  Iterable<number> {
     const matches = (node: number) =>
       type === AllEdgeTypes ||
       (Array.isArray(type)
@@ -455,13 +455,13 @@ export class AdjacencyList implements IAdjacencyList {
       }
       node = this._nodes.next(node);
     }
-    return [...nodes];
+    return nodes;
   }
 
   /**
    * Get the list of nodes connected to this node.
    */
-  getNodeIdsConnectedTo(to: number, type = 1): number[] {
+  getNodeIdsConnectedTo(to: number, type = 1): Iterable<number> {
     const matches = (node: number) =>
       type === AllEdgeTypes ||
       (Array.isArray(type)
@@ -480,7 +480,7 @@ export class AdjacencyList implements IAdjacencyList {
       }
       node = this._nodes.next(node);
     }
-    return [...nodes];
+    return nodes;
   }
 
   inspect() {
