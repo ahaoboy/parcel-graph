@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/index.js",
   "import": "./dist/index.mjs",
-  "types": "./dist/src/index.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "src"
