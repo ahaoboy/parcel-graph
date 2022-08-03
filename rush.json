@@ -399,11 +399,13 @@
     {
       "packageName": "@parcel-graph/core",
       "projectFolder": "apps/core",
+      "versionPolicyName": "same",
       "shouldPublish": true
     },
     {
       "packageName": "@parcel-graph/type",
       "projectFolder": "apps/type",
+      "versionPolicyName": "same",
       "shouldPublish": true
     }
     // {
