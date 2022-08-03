@@ -12,8 +12,7 @@ export class AdjacencyList implements IAdjacencyList {
   >();
   private _nodesSet: Set<number> = new Set();
   private _NEXT_NODE_ID = 0;
-  constructor() {
-  }
+  constructor() {}
   private _addEdgeTo(
     from: number,
     to: number,
@@ -76,10 +75,14 @@ export class AdjacencyList implements IAdjacencyList {
     const keys = [...typeMap.keys()].filter(
       (i) => typeSet.has(AllEdgeTypes) || typeSet.has(i)
     );
-    const nodes = new Set<number>();
+    const seen = new Set<number>();
+    const nodes: number[] = [];
     for (const k of keys) {
       for (const id of typeMap.get(k) ?? []) {
-        nodes.add(id);
+        if(!seen.has(id)){
+          seen.add(id);
+          nodes.push(id);
+        }
       }
     }
     return nodes;
@@ -91,11 +94,15 @@ export class AdjacencyList implements IAdjacencyList {
     const keys = [...typeMap.keys()].filter(
       (i) => typeSet.has(AllEdgeTypes) || typeSet.has(i)
     );
-    const nodes = new Set<number>();
+    const seen = new Set<number>();
 
+    const nodes: number[] = [];
     for (const k of keys) {
       for (const id of typeMap.get(k) ?? []) {
-        nodes.add(id);
+        if (!seen.has(id)) {
+          seen.add(id);
+          nodes.push(id);
+        }
       }
     }
     return nodes;

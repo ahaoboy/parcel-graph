@@ -71,8 +71,8 @@ export interface IAdjacencyList {
   hasInboundEdges: (to: number) => boolean;
   getNodeIdsConnectedTo: (nodeId: number, type?: number) => Iterable<number>;
   getNodeIdsConnectedFrom: (nodeId: number, type?: number) => Iterable<number>;
-  getInboundEdges: (from: number, type: number) => Set<number>;
-  getOutboundEdges: (from: number, type: number) => Set<number>;
+  getInboundEdges: (from: number, type: number) => Iterable<number>;
+  getOutboundEdges: (from: number, type: number) => Iterable<number>;
   getOutboundEdgesByType: (from: number) => { type: number; to: number }[];
   getInboundEdgesByType: (to: number) => { type: number; from: number }[];
   // getNodesConnectedFrom: (from: number, type?: number) => number[];

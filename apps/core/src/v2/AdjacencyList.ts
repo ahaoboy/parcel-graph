@@ -436,20 +436,25 @@ export class AdjacencyList implements IAdjacencyList {
   /**
    * Get the list of nodes connected from this node.
    */
-  getNodeIdsConnectedFrom(from: number, type = 1):  Iterable<number> {
+  getNodeIdsConnectedFrom(from: number, type = 1): Iterable<number> {
     const matches = (node: number) =>
       type === AllEdgeTypes ||
       (Array.isArray(type)
         ? type.includes(this._nodes.typeOf(node))
         : type === this._nodes.typeOf(node));
 
-    const nodes = new Set<number>();
+    const seen = new Set<number>();
+    const nodes: number[] = [];
     let node = this._nodes.head(from);
     while (node !== null) {
       if (matches(node)) {
         let edge = this._nodes.firstOut(node);
         while (edge !== null) {
-          nodes.add(this._edges.to(edge));
+          const id = this._edges.to(edge);
+          if (!seen.has(id)) {
+            nodes.push(id);
+            seen.add(id);
+          }
           edge = this._edges.nextOut(edge);
         }
       }
@@ -468,13 +473,19 @@ export class AdjacencyList implements IAdjacencyList {
         ? type.includes(this._nodes.typeOf(node))
         : type === this._nodes.typeOf(node));
 
-    const nodes = new Set<number>();
+    const seen = new Set<number>();
+    const nodes: number[] = [];
+
     let node = this._nodes.head(to);
     while (node !== null) {
       if (matches(node)) {
         let edge = this._nodes.firstIn(node);
         while (edge !== null) {
-          nodes.add(this._edges.from(edge));
+          const id = this._edges.from(edge);
+          if (!seen.has(id)) {
+            nodes.push(id);
+            seen.add(id);
+          }
           edge = this._edges.nextIn(edge);
         }
       }
@@ -718,7 +729,10 @@ export class SharedTypeMap implements Iterable<number> {
     this.data.set(data.subarray(COUNT, HEADER_SIZE), COUNT);
 
     // Copy the hash table.
-    const toTable = this.data.subarray(HEADER_SIZE, HEADER_SIZE + this.capacity);
+    const toTable = this.data.subarray(
+      HEADER_SIZE,
+      HEADER_SIZE + this.capacity
+    );
     toTable.set(data.subarray(HEADER_SIZE, HEADER_SIZE + data[CAPACITY]!));
     // Offset first links to account for the change in table capacity.
     let max = toTable.length;
@@ -848,8 +862,8 @@ export class NodeTypeMap extends SharedTypeMap {
   static MAX_CAPACITY: number = Math.floor(
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_array_length_what_went_wrong
     (2 ** 31 - 1 - NodeTypeMap._HEADER_SIZE) /
-    NodeTypeMap.ITEM_SIZE /
-    SharedTypeMap.BUCKET_SIZE
+      NodeTypeMap.ITEM_SIZE /
+      SharedTypeMap.BUCKET_SIZE
   );
 
   get HEADER_SIZE() {
@@ -1042,8 +1056,8 @@ export class EdgeTypeMap extends SharedTypeMap {
   static MAX_CAPACITY: number = Math.floor(
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Invalid_array_length_what_went_wrong
     (2 ** 31 - 1 - EdgeTypeMap._HEADER_SIZE) /
-    EdgeTypeMap.ITEM_SIZE /
-    EdgeTypeMap.BUCKET_SIZE
+      EdgeTypeMap.ITEM_SIZE /
+      EdgeTypeMap.BUCKET_SIZE
   );
   /** The size after which to grow the capacity by the minimum factor. */
   static PEAK_CAPACITY: number = 2 ** 18;

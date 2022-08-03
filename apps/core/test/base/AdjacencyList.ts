@@ -47,10 +47,10 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
       graph.addEdge(node5, node1);
       graph.addEdge(node6, node1);
 
-      assert.deepEqual(graph.getNodeIdsConnectedTo(node1), new Set([0, 2, 3, 4, 5, 6]));
+      assert.deepEqual(graph.getNodeIdsConnectedTo(node1), [0, 2, 3, 4, 5, 6]);
 
       graph.removeEdge(node3, node1);
-      assert.deepEqual(graph.getNodeIdsConnectedTo(node1), new Set([0, 2, 4, 5, 6]));
+      assert.deepEqual(graph.getNodeIdsConnectedTo(node1), [0, 2, 4, 5, 6]);
     });
 
     it("removeEdge should remove an edge of a specific type from the graph", () => {
@@ -131,7 +131,7 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
       graph.addEdge(a, b);
       graph.addEdge(a, d);
       graph.addEdge(a, c);
-      assert.deepEqual(graph.getNodeIdsConnectedFrom(a), new Set([b, d, c]));
+      assert.deepEqual(graph.getNodeIdsConnectedFrom(a), [b, d, c]);
     });
 
     it("addEdge should add multiple edges to a node in order", () => {
@@ -144,7 +144,7 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
       graph.addEdge(d, b);
       graph.addEdge(a, d);
       graph.addEdge(c, b);
-      assert.deepEqual(graph.getNodeIdsConnectedTo(b), new Set([a, d, c]));
+      assert.deepEqual(graph.getNodeIdsConnectedTo(b), [a, d, c]);
     });
 
     it("addEdge should add multiple edges of different types in order", () => {
@@ -155,7 +155,7 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
       graph.addEdge(a, b, 1);
       graph.addEdge(a, b, 4);
       graph.addEdge(a, b, 3);
-      assert.deepEqual(graph.getNodeIdsConnectedFrom(a), new Set([b]));
+      assert.deepEqual(graph.getNodeIdsConnectedFrom(a), [b]);
       assert.deepEqual(Array.from(graph.getAllEdges()), [
         { from: a, to: b, type: 1 },
         { from: a, to: b, type: 4 },
@@ -170,7 +170,6 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
       assert.equal(graph.addEdge(a, b), true);
       assert.equal(graph.addEdge(a, b), false);
     });
-
 
     it("addEdge should error when a node has not been added to the graph", () => {
       let graph = new AdjacencyList();
@@ -244,8 +243,8 @@ export function test(AdjacencyList: new () => IAdjacencyList) {
     graph.addEdge(a, b);
     graph.addEdge(a, c);
     graph.addEdge(a, b, 2);
-    assert.deepEqual(graph.getNodeIdsConnectedFrom(a, -1), new Set([b, c]));
-    assert.deepEqual(graph.getNodeIdsConnectedTo(b, -1), new Set([a]));
+    assert.deepEqual(graph.getNodeIdsConnectedFrom(a, -1), [b, c]);
+    assert.deepEqual(graph.getNodeIdsConnectedTo(b, -1), [a]);
   });
   // describe('deserialize', function () {
   //   this.timeout(10000);
