@@ -1,4 +1,4 @@
 export const SharedBuffer:
   | ArrayBufferConstructor
   | SharedArrayBufferConstructor =
-  typeof SharedArrayBuffer === "undefined" ? SharedArrayBuffer : ArrayBuffer;
+  typeof SharedArrayBuffer !== "undefined" ? SharedArrayBuffer : ArrayBuffer;

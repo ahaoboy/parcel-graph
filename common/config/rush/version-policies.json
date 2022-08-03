@@ -12,8 +12,8 @@
   {
     "definitionName": "lockStepVersion",
     "policyName": "same",
-    "version": "1.4.3-0",
-    "nextBump": "prerelease"
+    "version": "1.4.3",
+    "nextBump": "patch"
   }
   // {
   //   /**
