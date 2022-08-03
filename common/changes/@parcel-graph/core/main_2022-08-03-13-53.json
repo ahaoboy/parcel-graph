@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@parcel-graph/core",
+      "comment": "fix type",
+      "type": "none"
+    }
+  ],
+  "packageName": "@parcel-graph/core"
+}
