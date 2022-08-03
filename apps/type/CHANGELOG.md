@@ -1,6 +1,13 @@
 # Change Log - @parcel-graph/type
 
-This log was last generated on Thu, 05 May 2022 02:17:31 GMT and should not be manually modified.
+This log was last generated on Wed, 03 Aug 2022 15:35:50 GMT and should not be manually modified.
+
+## 1.4.4
+Wed, 03 Aug 2022 15:35:50 GMT
+
+### Updates
+
+- fix type
 
 ## 1.0.4
 Thu, 05 May 2022 02:17:31 GMT
