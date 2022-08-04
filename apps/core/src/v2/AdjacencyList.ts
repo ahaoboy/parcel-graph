@@ -95,8 +95,11 @@ export class AdjacencyList implements IAdjacencyList {
       this._edges = new EdgeTypeMap(edgeCapacity);
     }
   }
-  getInboundEdges(from: number, type: number): Set<number> {
-    return new Set();
+  getInboundEdges(from: number, type: number): Array<number> {
+    throw new Error('replace by getNodeIdsConnectedFrom')
+  }
+  getOutboundEdges(from: number, type: number): Array<number> {
+    throw new Error('replace by getNodeIdsConnectedTo')
   }
   get stats(): {
     /** The number of nodes in the graph. */
@@ -177,12 +180,7 @@ export class AdjacencyList implements IAdjacencyList {
       uniformity: Math.round(uniformity * 100) / 100 || 0,
     };
   }
-  getInboundEdge(from: number, type: number): Set<number> {
-    return new Set();
-  }
-  getOutboundEdges(from: number, type: number): Set<number> {
-    return new Set();
-  }
+
 
   /**
    * Create a new `AdjacencyList` from the given options.
@@ -436,7 +434,7 @@ export class AdjacencyList implements IAdjacencyList {
   /**
    * Get the list of nodes connected from this node.
    */
-  getNodeIdsConnectedFrom(from: number, type = 1): Iterable<number> {
+  getNodeIdsConnectedFrom(from: number, type = 1): Array<number> {
     const matches = (node: number) =>
       type === AllEdgeTypes ||
       (Array.isArray(type)
@@ -466,7 +464,7 @@ export class AdjacencyList implements IAdjacencyList {
   /**
    * Get the list of nodes connected to this node.
    */
-  getNodeIdsConnectedTo(to: number, type = 1): Iterable<number> {
+  getNodeIdsConnectedTo(to: number, type = 1): Array<number> {
     const matches = (node: number) =>
       type === AllEdgeTypes ||
       (Array.isArray(type)
