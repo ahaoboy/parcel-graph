@@ -14,7 +14,7 @@ export interface IGraph<N = number> {
   //   nodes: Uint32Array;
   //   // edges: Uint32Array
   // };
-  serialize:()=>any;
+  serialize: () => any;
   getNodeIdsConnectedTo: (nodeId: number, type?: number) => Array<number>;
   getNodeIdsConnectedFrom: (nodeId: number, type?: number) => Array<number>;
   hasEdge: (from: number, to: number, type?: number) => boolean;
@@ -60,12 +60,19 @@ export interface IAdjacencyList {
   addNode: () => number;
   addEdge: (from: number, to: number, type?: number) => boolean;
   removeEdge: (from: number, to: number, type?: number) => boolean;
+  // serialize: () => {
+  //   nodes: TypedArray;
+  //   edges: TypedArray
+  // };
+
   serialize: () => any;
+
   getAllEdges: () => Generator<{
     from: number;
     to: number;
     type: number;
   }>;
+
   hasEdge: (from: number, to: number, type?: number) => boolean;
   resizeEdges: (n: number) => boolean;
   hasInboundEdges: (to: number) => boolean;
@@ -78,3 +85,9 @@ export interface IAdjacencyList {
   // getNodesConnectedFrom: (from: number, type?: number) => number[];
   // getNodesConnectedTo: (to: number, type?: number) => number[];
 }
+
+export type TypedArrayConstructor =
+  | Uint32ArrayConstructor
+  | Uint16ArrayConstructor
+  | Uint8ArrayConstructor;
+export type TypedArray = Uint32Array | Uint16Array | Uint8Array;

@@ -1,14 +1,12 @@
-import type { IAdjacencyList } from "@parcel-graph/type";
-import { AllEdgeTypes } from "@parcel-graph/type";
-import { SharedBuffer } from "../SharedBuffer";
-import { hash32shift, assert } from "../share";
-import { nullthrows } from "../share";
-
-type TypedArrayConstructor =
-  | Uint32ArrayConstructor
-  | Uint16ArrayConstructor
-  | Uint8ArrayConstructor;
-type TypedArray = Uint32Array | Uint16Array | Uint8Array;
+import type {
+  IAdjacencyList,
+  TypedArrayConstructor,
+  TypedArray,
+} from '@parcel-graph/type';
+import { AllEdgeTypes } from '@parcel-graph/type';
+import { SharedBuffer } from '../SharedBuffer';
+import { hash32shift, assert } from '../share';
+import { nullthrows } from '../share';
 
 /** The upper bound above which capacity should be increased. */
 const LOAD_FACTOR = 0.7;
@@ -28,7 +26,7 @@ function interpolate(x: number, y: number, t: number): number {
 function increaseNodeCapacity(nodeCapacity: number): number {
   const { MIN_CAPACITY, MAX_CAPACITY } = NodeTypeMap;
   const newCapacity = Math.round(nodeCapacity * MIN_GROW_FACTOR);
-  assert(newCapacity <= MAX_CAPACITY, "Node capacity overflow!");
+  assert(newCapacity <= MAX_CAPACITY, 'Node capacity overflow!');
   return Math.max(MIN_CAPACITY, newCapacity);
 }
 
@@ -52,7 +50,7 @@ function getNextEdgeCapacity(
     // but this is only likely to occur when a lot of edges have been removed.
     newCapacity = Math.round(capacity * SHRINK_FACTOR);
   }
-  assert(newCapacity <= MAX_CAPACITY, "Edge capacity overflow!");
+  assert(newCapacity <= MAX_CAPACITY, 'Edge capacity overflow!');
   return Math.max(MIN_CAPACITY, newCapacity);
 }
 
@@ -76,12 +74,14 @@ export type AdjacencyListOptions<T> = {
 export class AdjacencyList implements IAdjacencyList {
   _nodes: NodeTypeMap /*: NodeTypeMap<number | number> */;
   _edges: EdgeTypeMap /*: EdgeTypeMap<number | number> */;
+  _typedArray: TypedArrayConstructor;
   constructor(
     opts?: SerializedAdjacencyList<number> | AdjacencyListOptions<number>
   ) {
     let nodes;
     let edges;
     const typedArray = opts?.typedArray || Uint32Array;
+    this._typedArray = typedArray;
     if (opts?.nodes) {
       ({ nodes, edges } = opts);
       this._nodes = new NodeTypeMap(nodes, typedArray);
@@ -93,21 +93,21 @@ export class AdjacencyList implements IAdjacencyList {
       } = opts ?? {};
       assert(
         nodeCapacity <= NodeTypeMap.MAX_CAPACITY,
-        "Node capacity overflow!"
+        'Node capacity overflow!'
       );
       assert(
         edgeCapacity <= EdgeTypeMap.MAX_CAPACITY,
-        "Edge capacity overflow!"
+        'Edge capacity overflow!'
       );
       this._nodes = new NodeTypeMap(nodeCapacity, typedArray);
       this._edges = new EdgeTypeMap(edgeCapacity, typedArray);
     }
   }
   getInboundEdges(from: number, type: number): Array<number> {
-    throw new Error('replace by getNodeIdsConnectedFrom')
+    throw new Error('replace by getNodeIdsConnectedFrom');
   }
   getOutboundEdges(from: number, type: number): Array<number> {
-    throw new Error('replace by getNodeIdsConnectedTo')
+    throw new Error('replace by getNodeIdsConnectedTo');
   }
   get stats(): {
     /** The number of nodes in the graph. */
@@ -189,7 +189,6 @@ export class AdjacencyList implements IAdjacencyList {
     };
   }
 
-
   /**
    * Create a new `AdjacencyList` from the given options.
    */
@@ -232,6 +231,7 @@ export class AdjacencyList implements IAdjacencyList {
     const copy = new AdjacencyList({
       nodeCapacity: this._nodes.capacity,
       edgeCapacity: size,
+      typedArray: this._typedArray,
     });
 
     // Copy the existing edges into the new array.
@@ -633,7 +633,7 @@ export class SharedTypeMap implements Iterable<number> {
     capacityOrData: number | TypedArray = 16,
     typedArray: TypedArrayConstructor = Uint32Array
   ) {
-    if (typeof capacityOrData === "number") {
+    if (typeof capacityOrData === 'number') {
       let { BYTES_PER_ELEMENT } = typedArray;
       const CAPACITY = SharedTypeMap._CAPACITY;
       this.data = new typedArray(
@@ -642,7 +642,7 @@ export class SharedTypeMap implements Iterable<number> {
       this.data[CAPACITY] = capacityOrData;
     } else {
       this.data = capacityOrData;
-      assert(this.getLength() === this.data.length, "Data appears corrupt.");
+      assert(this.getLength() === this.data.length, 'Data appears corrupt.');
     }
   }
   *[Symbol.iterator](): Iterator<number> {
@@ -732,7 +732,7 @@ export class SharedTypeMap implements Iterable<number> {
     const CAPACITY = SharedTypeMap._CAPACITY;
 
     const delta = this.capacity - data[CAPACITY]!;
-    assert(delta >= 0, "Cannot copy to a map with smaller capacity.");
+    assert(delta >= 0, 'Cannot copy to a map with smaller capacity.');
 
     // Copy the header.
     this.data.set(data.subarray(COUNT, HEADER_SIZE), COUNT);
