@@ -4,6 +4,12 @@ import { SharedBuffer } from "../SharedBuffer";
 import { hash32shift, assert } from "../share";
 import { nullthrows } from "../share";
 
+type TypedArrayConstructor =
+  | Uint32ArrayConstructor
+  | Uint16ArrayConstructor
+  | Uint8ArrayConstructor;
+type TypedArray = Uint32Array | Uint16Array | Uint8Array;
+
 /** The upper bound above which capacity should be increased. */
 const LOAD_FACTOR = 0.7;
 /** The lower bound below which capacity should be decreased. */
@@ -51,10 +57,11 @@ function getNextEdgeCapacity(
 }
 
 export type SerializedAdjacencyList<T> = {
-  nodes: Uint32Array;
-  edges: Uint32Array;
+  nodes: TypedArray;
+  edges: TypedArray;
   edgeCapacity?: never;
   nodeCapacity?: never;
+  typedArray?: TypedArrayConstructor;
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -63,6 +70,7 @@ export type AdjacencyListOptions<T> = {
   edges?: never;
   edgeCapacity?: number;
   nodeCapacity?: number;
+  typedArray?: TypedArrayConstructor;
 };
 
 export class AdjacencyList implements IAdjacencyList {
@@ -73,11 +81,11 @@ export class AdjacencyList implements IAdjacencyList {
   ) {
     let nodes;
     let edges;
-
+    const typedArray = opts?.typedArray || Uint32Array;
     if (opts?.nodes) {
       ({ nodes, edges } = opts);
-      this._nodes = new NodeTypeMap(nodes);
-      this._edges = new EdgeTypeMap(edges);
+      this._nodes = new NodeTypeMap(nodes, typedArray);
+      this._edges = new EdgeTypeMap(edges, typedArray);
     } else {
       let {
         nodeCapacity = NodeTypeMap.MIN_CAPACITY,
@@ -91,8 +99,8 @@ export class AdjacencyList implements IAdjacencyList {
         edgeCapacity <= EdgeTypeMap.MAX_CAPACITY,
         "Edge capacity overflow!"
       );
-      this._nodes = new NodeTypeMap(nodeCapacity);
-      this._edges = new EdgeTypeMap(edgeCapacity);
+      this._nodes = new NodeTypeMap(nodeCapacity, typedArray);
+      this._edges = new EdgeTypeMap(edgeCapacity, typedArray);
     }
   }
   getInboundEdges(from: number, type: number): Set<number> {
@@ -581,7 +589,7 @@ export class SharedTypeMap implements Iterable<number> {
 
   /** The number of items to accommodate per hash bucket. */
   static BUCKET_SIZE: number = 2;
-  data: Uint32Array;
+  data: TypedArray;
 
   get BUCKET_SIZE() {
     return SharedTypeMap.BUCKET_SIZE;
@@ -623,11 +631,14 @@ export class SharedTypeMap implements Iterable<number> {
     })} mb`;
   }
 
-  constructor(capacityOrData: number | Uint32Array = 16) {
+  constructor(
+    capacityOrData: number | TypedArray = 16,
+    typedArray: TypedArrayConstructor = Uint32Array
+  ) {
     if (typeof capacityOrData === "number") {
-      let { BYTES_PER_ELEMENT } = Uint32Array;
+      let { BYTES_PER_ELEMENT } = typedArray;
       const CAPACITY = SharedTypeMap._CAPACITY;
-      this.data = new Uint32Array(
+      this.data = new typedArray(
         new SharedBuffer(this.getLength(capacityOrData) * BYTES_PER_ELEMENT)
       );
       this.data[CAPACITY] = capacityOrData;
@@ -686,9 +697,9 @@ export class SharedTypeMap implements Iterable<number> {
   }
 
   inspect(): {
-    header: Uint32Array;
-    table: Uint32Array;
-    data: Uint32Array;
+    header: TypedArray;
+    table: TypedArray;
+    data: TypedArray;
   } {
     const { HEADER_SIZE, ITEM_SIZE, BUCKET_SIZE } = this;
     const min = HEADER_SIZE + this.capacity;
@@ -716,7 +727,7 @@ export class SharedTypeMap implements Iterable<number> {
       }
     }
   }
-  set(data: Uint32Array): void {
+  set(data: TypedArray): void {
     const { HEADER_SIZE, ITEM_SIZE } = this;
     const NEXT = SharedTypeMap._NEXT;
     const COUNT = SharedTypeMap._COUNT;
