@@ -145,11 +145,11 @@ export class AdjacencyList implements IAdjacencyList {
     this._inboundEdges.delete(nodeId);
     this._outboundEdges.delete(nodeId);
   }
-  getInboundEdges(from: number, type: number): Set<number> {
-    return this._inboundEdges?.get(from)?.get(type) ?? new Set<number>();
+  getInboundEdges(from: number, type: number): Array<number> {
+    return [...this._inboundEdges?.get(from)?.get(type) ?? []] ;
   }
-  getOutboundEdges(from: number, type: number): Set<number> {
-    return this._outboundEdges?.get(from)?.get(type) ?? new Set<number>();
+  getOutboundEdges(from: number, type: number): Array<number> {
+    return [...this._outboundEdges?.get(from)?.get(type) ?? []];
   }
   getOutboundEdgesByType(from: number): { type: number; to: number }[] {
     const edges: { type: number; to: number }[] = [];

@@ -15,8 +15,8 @@ export interface IGraph<N = number> {
   //   // edges: Uint32Array
   // };
   serialize:()=>any;
-  getNodeIdsConnectedTo: (nodeId: number, type?: number) => Iterable<number>;
-  getNodeIdsConnectedFrom: (nodeId: number, type?: number) => Iterable<number>;
+  getNodeIdsConnectedTo: (nodeId: number, type?: number) => Array<number>;
+  getNodeIdsConnectedFrom: (nodeId: number, type?: number) => Array<number>;
   hasEdge: (from: number, to: number, type?: number) => boolean;
   resizeEdges: (n: number) => boolean;
 
@@ -69,10 +69,10 @@ export interface IAdjacencyList {
   hasEdge: (from: number, to: number, type?: number) => boolean;
   resizeEdges: (n: number) => boolean;
   hasInboundEdges: (to: number) => boolean;
-  getNodeIdsConnectedTo: (nodeId: number, type?: number) => Iterable<number>;
-  getNodeIdsConnectedFrom: (nodeId: number, type?: number) => Iterable<number>;
-  getInboundEdges: (from: number, type: number) => Iterable<number>;
-  getOutboundEdges: (from: number, type: number) => Iterable<number>;
+  getNodeIdsConnectedTo: (nodeId: number, type?: number) => Array<number>;
+  getNodeIdsConnectedFrom: (nodeId: number, type?: number) => Array<number>;
+  getInboundEdges: (from: number, type: number) => Array<number>;
+  getOutboundEdges: (from: number, type: number) => Array<number>;
   getOutboundEdgesByType: (from: number) => { type: number; to: number }[];
   getInboundEdgesByType: (to: number) => { type: number; from: number }[];
   // getNodesConnectedFrom: (from: number, type?: number) => number[];
